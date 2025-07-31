@@ -1,0 +1,50 @@
+<?php
+
+namespace App\Controllers;
+
+use App\Controllers\BaseController;
+use App\Models\UserModel;
+
+class LoginController extends BaseController
+{
+    public function index()
+    {
+        return view('login');
+    }
+
+    public function authenticate()
+    {
+        $email    = $this->request->getPost('email');
+        $password = $this->request->getPost('password');
+
+        $userModel = new \App\Models\UserModel();
+        $user = $userModel->where('email', $email)->first();
+
+        if (! $user || ! password_verify($password, $user['password'])) {
+            return redirect()->back()->withInput()->with('error', 'Email atau password salah!');
+        }
+
+        session()->set([
+            'user_id'   => $user['id'],
+            'name'      => $user['name'],
+            'email'     => $user['email'],
+            'role'      => $user['role'],
+            'logged_in' => true,
+        ]);
+
+        // Redirect ke dashboard berdasarkan role
+        if ($user['role'] === 'admin') {
+            return redirect()->to('/admin/dashboard')->with('success', 'Selamat datang, Admin!');
+        } elseif ($user['role'] === 'owner') {
+            return redirect()->to('/owner/dashboard')->with('success', 'Selamat datang, Owner!');
+        } else {
+            return redirect()->to('/member/dashboard')->with('success', 'Selamat datang, Member!');
+        }
+    }
+
+    public function logout()
+    {
+        session()->destroy();
+        return redirect()->to('/login')->with('success', 'Berhasil logout.');
+    }
+}
