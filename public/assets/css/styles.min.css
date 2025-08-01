@@ -123,10 +123,10 @@
   --bs-tertiary-bg: #f6f9fc;
   --bs-tertiary-bg-rgb: 246, 249, 252;
   --bs-heading-color: #2a3547;
-  --bs-link-color: #5d87ff;
+  --bs-link-color: #f15954;
   --bs-link-color-rgb: 93, 135, 255;
   --bs-link-decoration: underline;
-  --bs-link-hover-color: rgb(74.4, 108, 204);
+  --bs-link-hover-color: rgb(241, 79, 73);
   --bs-link-hover-color-rgb: 74, 108, 204;
   --bs-code-color: #d63384;
   --bs-highlight-color: #5a6a85;
@@ -153,6 +153,7 @@
   --bs-form-valid-border-color: #13deb9;
   --bs-form-invalid-color: #fa896b;
   --bs-form-invalid-border-color: #fa896b;
+  --bs-red: #ee2f2f;
 }
 
 [data-bs-theme="dark"] {
@@ -209,6 +210,7 @@
   --bs-form-valid-border-color: rgb(113.4, 235.2, 213);
   --bs-form-invalid-color: rgb(252, 184.2, 166.2);
   --bs-form-invalid-border-color: rgb(252, 184.2, 166.2);
+  --bs-red: #ee2f2f;
 }
 
 *,
@@ -11185,6 +11187,10 @@ fieldset:disabled .btn {
 .bg-danger {
   --bs-bg-opacity: 1;
   background-color: rgba(var(--bs-danger-rgb), var(--bs-bg-opacity)) !important;
+}
+
+.bg-red {
+  color: #ee2f2f;
 }
 
 .bg-light {
