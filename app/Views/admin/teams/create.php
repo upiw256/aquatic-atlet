@@ -17,8 +17,8 @@
 
     <div class="mb-3">
         <label for="owner_id" class="form-label">Pilih Owner</label>
-        <select name="owner_id" class="form-select" >
-            <option value="">-- Pilih Member --</option>
+        <select name="owner_id" class="form-select" id="ownerSelect">
+            <option value="">Pilih Owner</option>
             <?php foreach ($owners as $owner): ?>
                 <option value="<?= esc($owner['id']) ?>"><?= esc($owner['name']) ?> (<?= esc($owner['email']) ?>)</option>
             <?php endforeach; ?>
@@ -32,5 +32,13 @@
     <button type="submit" class="btn btn-success">Simpan</button>
     <a href="/admin/teams" class="btn btn-secondary">Kembali</a>
 </form>
+    <script>
+        $( '#ownerSelect' ).select2( {
+            theme: 'bootstrap-5',
+            placeholder: 'Pilih Owner',
+            allowClear: true,
+            width: '100%',
+        } );
+    </script>
 
 <?= $this->endSection() ?>

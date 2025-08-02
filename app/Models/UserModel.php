@@ -19,11 +19,9 @@ class UserModel extends Model
 
     public function getMembersWithTeam()
     {
-        return $this->db->table('users u')
-            ->select('u.*, t.name AS team_name')
-            ->join('teams t', 't.owner_id = u.id', 'left')
-            ->where('u.role !=', 'admin')
-            ->get()
-            ->getResultArray();
+    return $this->db->table('users u')
+        ->select('u.*, t.name AS team_name')
+        ->join('teams t', 't.owner_id = u.id', 'left')
+        ->where('u.role !=', 'admin');
     }
 }

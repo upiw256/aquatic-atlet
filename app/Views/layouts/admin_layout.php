@@ -6,9 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <base href="<?= base_url() ?>/">
     <title><?= $title ?? 'Member Area' ?></title>
+    <!-- Styles -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+<!-- Or for RTL support -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.rtl.min.css" />
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <link rel="shortcut icon" type="image/png" href="../assets/images/logo-aquatic.png" />
     <link rel="stylesheet" href="../assets/css/styles.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <!-- <script src=" https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js "></script> -->
+    <!-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> -->
 </head>
 
 <body>
@@ -101,6 +116,16 @@
             </div>
         </div>
     </div>
+
+    <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/sidebarmenu.js"></script>
+    <script src="../assets/js/app.min.js"></script>
+    <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
+    <!-- solar icons -->
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+    <!-- <script src=" https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js "></script> -->
     <script>
         function assignOwner(teamId) {
             Swal.fire({
@@ -146,6 +171,45 @@
         <?php endif; ?>
     </script>
     <script>
+function confirmJadikanAdmin(userId, userName) {
+  Swal.fire({
+    title: 'Yakin akan merubah role?',
+    text:` ${userName} akan Merubah role.`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Ya, Setuju!',
+    cancelButtonText: 'Batal'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      fetch(`/admin/makeadmin/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': '<?= csrf_hash() ?>'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          Swal.fire({
+            title: 'Berhasil!',
+            html: data.message,
+            icon: 'success'
+          }).then(() => {
+            location.reload(); // reload seluruh halaman
+        });
+        } else {
+          Swal.fire('Error', data.message, 'error');
+        }
+      })
+      .catch(err => {
+        Swal.fire('Error', `Terjadi kesalahan saat menghubungi server. ${err}`, 'error');
+      });
+    }
+  });
+}
+    </script>
+    <script>
 function resetPassword(userId) {
   Swal.fire({
     title: 'Reset Password?',
@@ -181,16 +245,27 @@ function resetPassword(userId) {
     }
   });
 }
+
+
+
+
+
+
+document.getElementById('searchInput').addEventListener('keyup', function () {
+    const keyword = this.value.toLowerCase();
+    const rows = document.querySelectorAll('#userTable tbody tr');
+
+    rows.forEach(row => {
+        const nama = row.querySelector('.nama').textContent.toLowerCase();
+        const email = row.querySelector('.email').textContent.toLowerCase();
+
+        const cocok = nama.includes(keyword) || email.includes(keyword);
+
+        row.style.display = cocok ? '' : 'none';
+    });
+});
+
 </script>
-    <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
-    <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../assets/js/sidebarmenu.js"></script>
-    <script src="../assets/js/app.min.js"></script>
-    <script src="../assets/libs/apexcharts/dist/apexcharts.min.js"></script>
-    <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
-    <script src="../assets/js/dashboard.js"></script>
-    <!-- solar icons -->
-    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
 </body>
 
 </html>

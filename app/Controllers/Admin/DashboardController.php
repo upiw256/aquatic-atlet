@@ -22,10 +22,63 @@ class DashboardController extends BaseController
     }
     public function members()
     {
-        $userModel = new UserModel();
-        $members = $userModel->getMembersWithTeam(); // atau pakai filter role
-        return view('admin/members', ['members' => $members]);
+    $userModel = new UserModel();
+
+        // Ambil query builder
+        $builder = $userModel->getMembersWithTeam();
+
+        // Jalankan pagination manual
+        $perPage = 10;
+        $page = $this->request->getVar('page') ?? 1;
+
+        // Hitung total data
+        $total = $builder->countAllResults(false); // false: agar builder tidak di-reset
+
+        // Ambil data paginated
+        $members = $builder
+            ->limit($perPage, ($page - 1) * $perPage)
+            ->get()
+            ->getResultArray();
+
+        // Set up pagination bawaan
+        $pager = \Config\Services::pager();
+
+        return view('admin/members', [
+            'members' => $members,
+            'pager' => $pager->makeLinks($page, $perPage, $total, 'bootstrap_full'),
+            'page' => $page,
+            'perPage' => $perPage
+        ]);
     }
+
+    public function makeAdmin($id)
+    {
+        $userModel = new UserModel();
+        $user = $userModel->find($id);
+
+        if (!$user) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'User tidak ditemukan',
+            ])->setStatusCode(404);
+        }
+        // cek jika user sudah admin
+        if ($user['role'] === 'admin') {            
+            $userModel->update($id, ['role' => 'member']);
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => $user['name'].' berhasil dijadikan member',
+            ]);
+        }else{
+            $userModel->update($id, ['role' => 'admin']);
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => $user['name'].' berhasil dijadikan admin',
+            ]);
+        }
+
+    }
+
 
     public function teams()
     {
@@ -36,8 +89,11 @@ class DashboardController extends BaseController
     public function users()
     {
         $userModel = new UserModel();
-        $users = $userModel->findAll();
-        return view('admin/users', ['users' => $users]);
+        $data = [
+            'users' => $userModel->paginate(10,'group1'),       // ambil 10 data per halaman
+            'pager' => $userModel->pager               // kirim pager ke view
+        ];
+        return view('admin/users', $data);
     }
 
     public function usersReset($id)
