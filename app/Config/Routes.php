@@ -30,6 +30,8 @@ $routes->get('/owner/team', 'OwnerTeamController::index', ['filter' => 'role:own
 
 // Admin
 $routes->get('/admin/members', 'Admin\DashboardController::members', ['filter' => 'role:admin']);
+$routes->get('/admin/users', 'Admin\DashboardController::users', ['filter' => 'role:admin']);
+$routes->put('/admin/users/reset/(:segment)', 'Admin\DashboardController::usersReset/$1', ['filter' => 'role:admin']);
 $routes->get('/admin/teams', 'Admin\DashboardController::teams', ['filter' => 'role:admin']);
 $routes->get('/admin/teams/create', 'Admin\TeamController::create', ['filter' => 'role:admin']);
 $routes->post('/admin/teams/store', 'Admin\TeamController::store', ['filter' => 'role:admin']);

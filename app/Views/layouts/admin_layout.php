@@ -34,7 +34,7 @@
                         </li>
                         <li class="sidebar-item">
                             <a class="sidebar-link" href="/admin" aria-expanded="false">
-                                <i class="ti ti-atom"></i>
+                                <i class="ti ti-dashboard"></i>
                                 <span class="hide-menu">Dashboard</span>
                             </a>
                         </li>
@@ -46,8 +46,14 @@
                         </li>
                         <li class="sidebar-item">
                             <a class="sidebar-link" href="/admin/teams" aria-expanded="false">
-                                <i class="ti ti-users"></i>
+                                <i class="ti ti-atom"></i>
                                 <span class="hide-menu">Team</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="/admin/users" aria-expanded="false">
+                                <i class="ti ti-users"></i>
+                                <span class="hide-menu">User Management</span>
                             </a>
                         </li>
                     </ul>
@@ -139,6 +145,43 @@
             });
         <?php endif; ?>
     </script>
+    <script>
+function resetPassword(userId) {
+  Swal.fire({
+    title: 'Reset Password?',
+    text: "Password akan diganti secara acak.",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Ya, Reset!',
+    cancelButtonText: 'Batal'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      fetch(`/admin/users/reset/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': '<?= csrf_hash() ?>'
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          Swal.fire({
+            title: 'Berhasil!',
+            html: `Password baru: <strong>${data.new_password}</strong>`,
+            icon: 'success'
+          });
+        } else {
+          Swal.fire('Error', data.message, 'error');
+        }
+      })
+      .catch(err => {
+        Swal.fire('Error', 'Terjadi kesalahan saat menghubungi server.', 'error');
+      });
+    }
+  });
+}
+</script>
     <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
     <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../assets/js/sidebarmenu.js"></script>

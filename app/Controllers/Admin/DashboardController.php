@@ -22,16 +22,52 @@ class DashboardController extends BaseController
     }
     public function members()
     {
-        $userModel = new \App\Models\UserModel();
+        $userModel = new UserModel();
         $members = $userModel->getMembersWithTeam(); // atau pakai filter role
         return view('admin/members', ['members' => $members]);
     }
 
     public function teams()
     {
-        $teamModel = new \App\Models\TeamModel();
+        $teamModel = new TeamModel();
         $teams = $teamModel->getTeamsWithOwner(); // kamu bisa custom join owner
         return view('admin/teams', ['teams' => $teams]);
+    }
+    public function users()
+    {
+        $userModel = new UserModel();
+        $users = $userModel->findAll();
+        return view('admin/users', ['users' => $users]);
+    }
+
+    public function usersReset($id)
+    {
+        $userModel = new UserModel();
+        $user = $userModel->find($id);
+
+        if (!$user) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'User tidak ditemukan',
+            ])->setStatusCode(404);
+        }
+
+        // Generate password baru
+        $newPassword = $this->generateRandomPassword(8);
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+
+        // Update password
+        $userModel->update($id, ['password' => $hashedPassword]);
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'Password berhasil direset',
+            'new_password' => $newPassword,
+        ]);
+    }
+    function generateRandomPassword($length = 12) {
+        $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        return substr(str_shuffle(str_repeat($chars, ceil($length / strlen($chars)))), 0, $length);
     }
     
 }
