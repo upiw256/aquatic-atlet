@@ -75,25 +75,53 @@ class TeamController extends BaseController
     public function store()
     {
         $validation = \Config\Services::validation();
+        $logoFile   = $this->request->getFile('logo');
+
+        // Cek apakah ada file yang diupload dan valid
+        $uploadedExtension = ($logoFile && $logoFile->isValid() && !$logoFile->hasMoved())
+            ? $logoFile->getClientExtension()
+            : null;
+
+        // Format default pesan error (jika format tidak valid)
+        $formatErrorMessage = 'Format logo harus PNG, JPG, atau JPEG.';
+        if ($uploadedExtension) {
+            $formatErrorMessage .= ' Format yang Anda unggah: ' . $uploadedExtension . '.';
+        }
 
         $rules = [
             'name' => 'required|min_length[3]',
             'owner_id' => 'permit_empty|is_not_unique[users.id]',
             'description' => 'permit_empty|min_length[10]',
+            'logo' => [
+                'rules' => 'permit_empty|ext_in[logo,png,jpg,jpeg]|max_size[logo,2048]',
+                'label' => 'Logo Tim',
+                'errors' => [
+                    'ext_in'    => $formatErrorMessage,
+                    'max_size'  => 'Ukuran logo maksimal 2MB.',
+                ],
+            ],
         ];
-        $owners = $this->request->getPost('owner_id');
-        $owners = $owners === '' ? null : $owners;
 
         if (!$this->validate($rules)) {
             return redirect()->back()->withInput()->with('error', implode(', ', $validation->getErrors()));
         }
 
+        $owners = $this->request->getPost('owner_id');
+        $owners = $owners === '' ? null : $owners;
+
+        $logoName = null;
+        if ($logoFile && $logoFile->isValid() && !$logoFile->hasMoved()) {
+            $logoName = $logoFile->getRandomName();
+            $logoFile->move(ROOTPATH . 'public/uploads/logo/', $logoName);
+        }
+
         $teamModel = new TeamModel();
         $teamModel->insert([
             'id'          => Uuid::uuid4()->toString(),
-            'name' => $this->request->getPost('name'),
-            'owner_id' => $owners,
+            'name'        => $this->request->getPost('name'),
+            'owner_id'    => $owners,
             'description' => $this->request->getPost('description'),
+            'logo'        => $logoName,
         ]);
 
         return redirect()->to('/admin/teams')->with('success', 'Tim berhasil ditambahkan!');

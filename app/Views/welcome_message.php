@@ -84,6 +84,50 @@
         .navbar-toggler:focus {
             box-shadow: none;
         }
+
+        .team-item {
+            width: 120px;
+            margin: 15px;
+            text-align: center;
+            background: #f0f0f0;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            clip-path: polygon(0 0, 100% 0, 100% 90%, 50% 100%, 0 90%);
+        }
+
+        .team-header {
+            background-color: #7b0000;
+            color: #fff;
+            font-weight: bold;
+            padding: 6px 0;
+        }
+
+        .team-logo {
+            padding: 20px 10px;
+            height: 140px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .team-logo img {
+            max-height: 100px;
+            max-width: 100%;
+        }
+
+        .team-item.special {
+            background: linear-gradient(to bottom, #062a4d, #de1f26);
+            color: white;
+        }
+
+        .team-item.special .team-header {
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        .team-item.special .team-logo {
+            background-image: url('https://esports.id/img/grid.png');
+            background-size: cover;
+        }
     </style>
 </head>
 
@@ -117,6 +161,21 @@
             </div>
         </div>
     </nav>
+    <main>
+        <div class="container py-4">
+            <div class="d-flex flex-wrap justify-content-center">
+                <h1 class="text-center w-100 mb-4">Tim Akuatik Indonesia</h1>
+                <?php foreach ($teams as $team): ?>
+                    <div class="team-item special">
+                        <div class="team-header"><?= esc($team['name']) ?></div>
+                        <div class="team-logo">
+                            <img src="<?= base_url('uploads/logo/' . $team['logo']) ?>" alt="<?= esc($team['name']) ?>">
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </main>
 
     <!-- Script -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
