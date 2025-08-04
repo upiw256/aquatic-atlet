@@ -33,7 +33,13 @@
                             <?= csrf_field() ?>
                             <input type="hidden" name="member_id" value="<?= esc($member['team_member_id']) ?>">
                             <select name="role" class="form-select form-select-sm me-2">
-                                <option value="atlet" <?= $member['role'] === 'atlet' ? 'selected' : '' ?>>Atlet</option>
+                                <option value="point" <?= $member['role'] === 'point' ? 'selected' : '' ?>>Point</option>
+                                <option value="Left Flat" <?= $member['role'] === 'Left Flat' ? 'selected' : '' ?>>Left Flat</option>
+                                <option value="Right Flat" <?= $member['role'] === 'Right Flat' ? 'selected' : '' ?>>Right Flat</option>
+                                <option value="Left Wing" <?= $member['role'] === 'Left Wing' ? 'selected' : '' ?>>Left Wing</option>
+                                <option value="Right Wing" <?= $member['role'] === 'Right Wing' ? 'selected' : '' ?>>Right Wing</option>
+                                <option value="Center Forward" <?= $member['role'] === 'Center Forward' ? 'selected' : '' ?>>Center Forward</option>
+                                <option value="Goalkeeper" <?= $member['role'] === 'Goalkeeper' ? 'selected' : '' ?>>Goalkeeper</option>
                                 <option value="cadangan" <?= $member['role'] === 'cadangan' ? 'selected' : '' ?>>Cadangan</option>
                                 <option value="pelatih" <?= $member['role'] === 'pelatih' ? 'selected' : '' ?>>Pelatih</option>
                             </select>

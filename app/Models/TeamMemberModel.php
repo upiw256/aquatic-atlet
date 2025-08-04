@@ -35,11 +35,12 @@ class TeamMemberModel extends Model
     public function getMembersByTeam($teamId)
     {
         return $this->db->table($this->table)
-            ->select('users.*, team_members.id AS team_member_id, team_members.role AS role')
-            ->join('users', 'users.id = team_members.member_id')
-            ->where('team_members.team_id', $teamId)
-            ->get()
-            ->getResultArray();
+        ->select('u.*, b.*, team_members.id AS team_member_id, team_members.role AS role, team_members.status AS status')
+        ->join('users u', 'u.id = team_members.member_id')
+        ->join('biodata b', 'b.user_id = u.id', 'left')
+        ->where('team_members.team_id', $teamId)
+        ->get()
+        ->getResultArray();
     }
     public function isMemberInTeam($teamId, $memberId)
     {

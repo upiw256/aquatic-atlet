@@ -8,6 +8,7 @@ use CodeIgniter\Router\RouteCollection;
 
 // Home dan Auth
 $routes->get('/', 'Home::index');
+$routes->get('/team-detail/(:segment)', 'Home::teamDetail/$1');
 $routes->get('/register', 'RegisterController::index');
 $routes->post('/register', 'RegisterController::store');
 
@@ -59,6 +60,6 @@ $routes->post('/owner/profile/save', 'Owner\ProfileController::save', ['filter' 
 // Member
 $routes->get('/member/profile', 'Member\ProfileController::index', ['filter' => 'role:member']);
 $routes->post('/member/profile/save', 'Member\ProfileController::save', ['filter' => 'role:member']);
-$routes->get('/member/accept-invite/(:segment)', 'Member\DashboardController::acceptInvite/$1');
-$routes->get('/member/reject-invite/(:segment)', 'Member\DashboardController::rejectInvite/$1');
-$routes->get('/member/leave-team', 'Member\DashboardController::leaveTeam');
+$routes->get('/member/accept-invite/(:segment)', 'Member\DashboardController::acceptInvite/$1', ['filter' => 'role:member']);
+$routes->get('/member/reject-invite/(:segment)', 'Member\DashboardController::rejectInvite/$1', ['filter' => 'role:member']);
+$routes->get('/member/leave-team', 'Member\DashboardController::leaveTeam', ['filter' => 'role:member']);
