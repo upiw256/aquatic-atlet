@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\UserModel;
 use App\Models\TeamModel;
+use App\Models\TeamMemberModel;
 
 class DashboardController extends BaseController
 {
@@ -23,10 +24,10 @@ class DashboardController extends BaseController
     public function members()
     {
     $userModel = new UserModel();
-
+    $biodataTeamMemberModel = new TeamMemberModel();
         // Ambil query builder
         $builder = $userModel->getMembersWithTeam();
-
+        
         // Jalankan pagination manual
         $perPage = 10;
         $page = $this->request->getVar('page') ?? 1;
@@ -42,7 +43,10 @@ class DashboardController extends BaseController
 
         // Set up pagination bawaan
         $pager = \Config\Services::pager();
-
+        // dd($biodataTeamMemberModel);
+        foreach ($members as &$member) {
+            $member['team'] = $biodataTeamMemberModel->getTeamByMember($member['id']);
+        }
         return view('admin/members', [
             'members' => $members,
             'pager' => $pager->makeLinks($page, $perPage, $total, 'bootstrap_full'),
@@ -54,6 +58,7 @@ class DashboardController extends BaseController
     public function makeAdmin($id)
     {
         $userModel = new UserModel();
+        $getTeamByMember = new TeamMemberModel();
         $user = $userModel->find($id);
 
         if (!$user) {
@@ -70,6 +75,12 @@ class DashboardController extends BaseController
                 'message' => $user['name'].' berhasil dijadikan member',
             ]);
         }else{
+            if ($getTeamByMember->getTeamByMember($id)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'User adalah atlit, tidak bisa dijadikan admin',
+            ])->setStatusCode(400);
+        }
             $userModel->update($id, ['role' => 'admin']);
             return $this->response->setJSON([
                 'status' => 'success',
