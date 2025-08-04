@@ -19,7 +19,8 @@ class TeamModel extends Model
         'description',
         'owner_id',
         'created_at',
-        'updated_at'
+        'updated_at',
+        'logo',
     ];
 
     public function getTeamsWithOwner()

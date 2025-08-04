@@ -3,7 +3,7 @@
 
 <h1>Tambah Tim Baru</h1>
 
-<form action="/admin/teams/store" method="post">
+<form action="/admin/teams/store" method="post" enctype="multipart/form-data">
     <?= csrf_field() ?>
 
     <?php if (session()->getFlashdata('error')): ?>
@@ -24,9 +24,19 @@
             <?php endforeach; ?>
         </select>
     </div>
+
     <div class="mb-3">
         <label for="description" class="form-label">Deskripsi Tim</label>
         <textarea name="description" class="form-control" rows="4"><?= old('description') ?></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label for="logo" class="form-label">Logo Tim</label>
+        <input type="file" name="logo" class="form-control" accept="image/*" onchange="previewLogo(event)">
+        <small class="form-text text-muted">Format: PNG, JPG, maksimal 2MB.</small>
+        <div class="mt-3">
+            <img id="logoPreview" src="#" alt="Preview Logo" style="display: none; max-width: 200px; border: 1px solid #ccc; padding: 5px; border-radius: 5px;">
+        </div>
     </div>
 
     <button type="submit" class="btn btn-success">Simpan</button>
@@ -40,5 +50,26 @@
             width: '100%',
         } );
     </script>
+
+<script>
+function previewLogo(event) {
+    const input = event.target;
+    const preview = document.getElementById('logoPreview');
+
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        };
+
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        preview.src = '#';
+        preview.style.display = 'none';
+    }
+}
+</script>
 
 <?= $this->endSection() ?>
