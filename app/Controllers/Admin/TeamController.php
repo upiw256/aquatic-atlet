@@ -89,12 +89,20 @@ class TeamController extends BaseController
         }
 
         $teamModel = new TeamModel();
+        $userModel = new UserModel();
         $teamModel->insert([
             'id'          => Uuid::uuid4()->toString(),
             'name' => $this->request->getPost('name'),
             'owner_id' => $owners,
             'description' => $this->request->getPost('description'),
         ]);
+        // Jika ada owner yang dipilih, update role-nya jadi owner
+        if ($owners) {
+            $user = $userModel->find($owners);
+            if ($user) {
+                $userModel->update($owners, ['role' => 'owner']);
+            }
+        }
 
         return redirect()->to('/admin/teams')->with('success', 'Tim berhasil ditambahkan!');
     }
