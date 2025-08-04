@@ -7,7 +7,7 @@
     <?= csrf_field() ?>
     <div class="mb-3">
         <label for="team_id" class="form-label">Pilih Tim</label>
-        <select name="team_id" class="form-select" required>
+        <select name="team_id" class="form-select" id="teamSelect" required>
             <option value="">-- Pilih Tim --</option>
             <?php foreach ($teams as $team): ?>
                 <option value="<?= $team['id'] ?>"><?= esc($team['name']) ?></option>
@@ -16,5 +16,12 @@
     </div>
     <button type="submit" class="btn btn-primary">Simpan</button>
 </form>
-
+    <script>
+        $( '#teamSelect' ).select2( {
+            theme: 'bootstrap-5',
+            placeholder: 'Pilih Owner',
+            allowClear: true,
+            width: '100%',
+        } );
+    </script>
 <?= $this->endSection() ?>

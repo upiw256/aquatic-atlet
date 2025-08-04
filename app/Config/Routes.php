@@ -16,6 +16,8 @@ $routes->get('/login', 'LoginController::index');
 $routes->post('/login', 'LoginController::authenticate');
 $routes->get('/logout', 'LoginController::logout');
 
+$routes->get('admin/users/search', 'Admin\DashboardController::search');
+
 // Dashboard umum (jika mau redirect)
 $routes->get('/dashboard', 'DashboardController::index', ['filter' => 'role:admin,owner,member']);
 

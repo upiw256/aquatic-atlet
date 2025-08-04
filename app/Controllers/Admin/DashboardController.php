@@ -68,6 +68,12 @@ class DashboardController extends BaseController
             ])->setStatusCode(404);
         }
         // cek jika user sudah admin
+        if ($getTeamByMember->getTeamByMember($id)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'User adalah atlit, tidak bisa dijadikan admin',
+            ])->setStatusCode(400);
+        }
         if ($user['role'] === 'admin') {            
             $userModel->update($id, ['role' => 'member']);
             return $this->response->setJSON([
@@ -75,12 +81,7 @@ class DashboardController extends BaseController
                 'message' => $user['name'].' berhasil dijadikan member',
             ]);
         }else{
-            if ($getTeamByMember->getTeamByMember($id)) {
-            return $this->response->setJSON([
-                'status' => 'error',
-                'message' => 'User adalah atlit, tidak bisa dijadikan admin',
-            ])->setStatusCode(400);
-        }
+            
             $userModel->update($id, ['role' => 'admin']);
             return $this->response->setJSON([
                 'status' => 'success',
@@ -136,5 +137,19 @@ class DashboardController extends BaseController
         $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         return substr(str_shuffle(str_repeat($chars, ceil($length / strlen($chars)))), 0, $length);
     }
-    
+    public function search()
+{
+    $q = $this->request->getGet('q');
+    if (strlen($q) < 3) {
+        return $this->response->setJSON([]);
+    }
+
+    $users = new UserModel();
+    $users = $users->like('name', $q)
+                   ->orLike('email', $q)
+                   ->findAll();
+
+    return $this->response->setJSON($users);
+}
+
 }

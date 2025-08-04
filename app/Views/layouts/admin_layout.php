@@ -251,19 +251,19 @@ function resetPassword(userId) {
 
 
 
-document.getElementById('searchInput').addEventListener('keyup', function () {
-    const keyword = this.value.toLowerCase();
-    const rows = document.querySelectorAll('#userTable tbody tr');
+// document.getElementById('searchInput').addEventListener('keyup', function () {
+//     const keyword = this.value.toLowerCase();
+//     const rows = document.querySelectorAll('#userTable tbody tr');
 
-    rows.forEach(row => {
-        const nama = row.querySelector('.nama').textContent.toLowerCase();
-        const email = row.querySelector('.email').textContent.toLowerCase();
+//     rows.forEach(row => {
+//         const nama = row.querySelector('.nama').textContent.toLowerCase();
+//         const email = row.querySelector('.email').textContent.toLowerCase();
 
-        const cocok = nama.includes(keyword) || email.includes(keyword);
+//         const cocok = nama.includes(keyword) || email.includes(keyword);
 
-        row.style.display = cocok ? '' : 'none';
-    });
-});
+//         row.style.display = cocok ? '' : 'none';
+//     });
+// });
 
 </script>
 </body>
