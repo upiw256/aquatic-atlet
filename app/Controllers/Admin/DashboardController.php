@@ -22,16 +22,108 @@ class DashboardController extends BaseController
     }
     public function members()
     {
-        $userModel = new \App\Models\UserModel();
-        $members = $userModel->getMembersWithTeam(); // atau pakai filter role
-        return view('admin/members', ['members' => $members]);
+    $userModel = new UserModel();
+
+        // Ambil query builder
+        $builder = $userModel->getMembersWithTeam();
+
+        // Jalankan pagination manual
+        $perPage = 10;
+        $page = $this->request->getVar('page') ?? 1;
+
+        // Hitung total data
+        $total = $builder->countAllResults(false); // false: agar builder tidak di-reset
+
+        // Ambil data paginated
+        $members = $builder
+            ->limit($perPage, ($page - 1) * $perPage)
+            ->get()
+            ->getResultArray();
+
+        // Set up pagination bawaan
+        $pager = \Config\Services::pager();
+
+        return view('admin/members', [
+            'members' => $members,
+            'pager' => $pager->makeLinks($page, $perPage, $total, 'bootstrap_full'),
+            'page' => $page,
+            'perPage' => $perPage
+        ]);
     }
+
+    public function makeAdmin($id)
+    {
+        $userModel = new UserModel();
+        $user = $userModel->find($id);
+
+        if (!$user) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'User tidak ditemukan',
+            ])->setStatusCode(404);
+        }
+        // cek jika user sudah admin
+        if ($user['role'] === 'admin') {            
+            $userModel->update($id, ['role' => 'member']);
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => $user['name'].' berhasil dijadikan member',
+            ]);
+        }else{
+            $userModel->update($id, ['role' => 'admin']);
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => $user['name'].' berhasil dijadikan admin',
+            ]);
+        }
+
+    }
+
 
     public function teams()
     {
-        $teamModel = new \App\Models\TeamModel();
+        $teamModel = new TeamModel();
         $teams = $teamModel->getTeamsWithOwner(); // kamu bisa custom join owner
         return view('admin/teams', ['teams' => $teams]);
+    }
+    public function users()
+    {
+        $userModel = new UserModel();
+        $data = [
+            'users' => $userModel->paginate(10,'group1'),       // ambil 10 data per halaman
+            'pager' => $userModel->pager               // kirim pager ke view
+        ];
+        return view('admin/users', $data);
+    }
+
+    public function usersReset($id)
+    {
+        $userModel = new UserModel();
+        $user = $userModel->find($id);
+
+        if (!$user) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'User tidak ditemukan',
+            ])->setStatusCode(404);
+        }
+
+        // Generate password baru
+        $newPassword = $this->generateRandomPassword(8);
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+
+        // Update password
+        $userModel->update($id, ['password' => $hashedPassword]);
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'Password berhasil direset',
+            'new_password' => $newPassword,
+        ]);
+    }
+    function generateRandomPassword($length = 12) {
+        $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        return substr(str_shuffle(str_repeat($chars, ceil($length / strlen($chars)))), 0, $length);
     }
     
 }
