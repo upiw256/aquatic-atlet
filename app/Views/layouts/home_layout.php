@@ -102,19 +102,47 @@
 
         .team-item {
             width: 120px;
+            height: 200px;
             margin: 15px;
             text-align: center;
             background: #f0f0f0;
             border-radius: 0 0 8px 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             clip-path: polygon(0 0, 100% 0, 100% 90%, 50% 100%, 0 90%);
+            position: relative;
+            overflow: hidden;
+        }
+        .role-overlay {
+            position: absolute;
+            top: -20px; /* semakin negatif, semakin tinggi */
+            left: 0;
+            right: 0;
+            font-size: 12px;
+            font-weight: 600;
+            color: #fff;
+            background-color: rgba(123, 0, 0, 1);
+            padding: 3px 5px;
+            text-align: center;
+            z-index: 10;
+            border-radius: 5px;
+        }
+        .team-wrapper {
+            position: relative;
+            display: inline-block; /* biar lebarnya mengikuti isi */
+            margin: 15px;
+        }
+        .team-photo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .team-header {
             background-color: #7b0000;
             color: #fff;
+            font-size: 13px;
             font-weight: bold;
-            padding: 6px 0;
+            padding: 5px 0;
         }
 
         .team-logo {
@@ -142,6 +170,7 @@
 
         .team-item.special .team-header {
             background-color: rgba(0, 0, 0, 0.6);
+            height: 100px;
         }
 
         .team-item.special .team-logo {

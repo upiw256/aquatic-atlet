@@ -30,18 +30,7 @@ class Home extends BaseController
         }
         $owner = $userModel->find($team['owner_id']);
         $members = $memberModel->getMembersByTeam($team['id']);
-        $badgeColors = ['primary', 'secondary', 'success', 'danger', 'warning', 'info', 'dark'];
-        $shuffledColors = $badgeColors;
-        shuffle($shuffledColors);
-
-        foreach ($members as $index => &$member) {
-            if ($index < count($shuffledColors)) {
-                $member['badge_color'] = $shuffledColors[$index]; // warna unik
-            } else {
-                // Jika member lebih banyak dari jumlah warna, gunakan warna acak
-                $member['badge_color'] = $badgeColors[array_rand($badgeColors)];
-            }
-        }
+        // dd($members);
         $team['members'] = $members;
         //cek jika owner tidak ada
         if (!$owner) {

@@ -42,6 +42,7 @@
                                 <option value="Goalkeeper" <?= $member['role'] === 'Goalkeeper' ? 'selected' : '' ?>>Goalkeeper</option>
                                 <option value="cadangan" <?= $member['role'] === 'cadangan' ? 'selected' : '' ?>>Cadangan</option>
                                 <option value="pelatih" <?= $member['role'] === 'pelatih' ? 'selected' : '' ?>>Pelatih</option>
+                                <option value="manager" <?= $member['role'] === 'manager' ? 'selected' : '' ?>>Manager</option>
                             </select>
                             <button class="btn btn-sm btn-primary" type="submit">Ubah</button>
                         </form>
@@ -67,7 +68,7 @@
     <form method="post" action="/owner/team/add">
         <?= csrf_field() ?>
         <div class="input-group mb-3">
-            <select name="user_id" class="form-select" required>
+            <select name="user_id" class="form-select" id="memberSelect" required>
                 <option value="">-- Pilih Member --</option>
                 <?php foreach ($availableMembers as $am): ?>
                     <option value="<?= esc($am['id']) ?>"><?= esc($am['name']) ?> (<?= esc($am['email']) ?>)</option>
@@ -79,5 +80,14 @@
 <?php else: ?>
     <div class="alert alert-warning">Anda belum memiliki tim. Silakan hubungi admin.</div>
 <?php endif; ?>
+
+<script>
+        $( '#memberSelect' ).select2( {
+            theme: 'bootstrap-5',
+            placeholder: 'Pilih Owner',
+            allowClear: true,
+            width: '100%',
+        } );
+    </script>
 
 <?= $this->endSection() ?>

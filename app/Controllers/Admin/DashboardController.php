@@ -95,8 +95,9 @@ class DashboardController extends BaseController
     public function teams()
     {
         $teamModel = new TeamModel();
-        $teams = $teamModel->getTeamsWithOwner(); // kamu bisa custom join owner
-        return view('admin/teams', ['teams' => $teams]);
+        $teams = $teamModel->getTeamsWithOwner()->paginate(10, 'group1'); // kamu bisa custom join owner
+        $pager = $teamModel->pager;
+        return view('admin/teams', ['teams' => $teams, 'pager' => $pager]);
     }
     public function users()
     {

@@ -1,6 +1,6 @@
 <?= $this->extend('layouts/home_layout') ?>
 <?= $this->section('content') ?>
-    <h1 class="text-center w-100 mb-4">Tim Akuatik Indonesia</h1>
+    <h1 class="text-center w-100 mb-4">Tim Polo Air Indonesia</h1>
     <?php foreach ($teams as $team): ?>
         <a href="<?= base_url('team-detail/' . $team['id']) ?>" class="text-decoration-none">
         <div class="team-item" data-name="<?= strtolower(esc($team['name'])) ?>">
