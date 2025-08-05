@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\UserModel;
 use App\Models\TeamModel;
+use App\Models\TeamMemberModel;
 
 class DashboardController extends BaseController
 {
@@ -23,10 +24,10 @@ class DashboardController extends BaseController
     public function members()
     {
     $userModel = new UserModel();
-
+    $biodataTeamMemberModel = new TeamMemberModel();
         // Ambil query builder
         $builder = $userModel->getMembersWithTeam();
-
+        
         // Jalankan pagination manual
         $perPage = 10;
         $page = $this->request->getVar('page') ?? 1;
@@ -42,7 +43,10 @@ class DashboardController extends BaseController
 
         // Set up pagination bawaan
         $pager = \Config\Services::pager();
-
+        // dd($biodataTeamMemberModel);
+        foreach ($members as &$member) {
+            $member['team'] = $biodataTeamMemberModel->getTeamByMember($member['id']);
+        }
         return view('admin/members', [
             'members' => $members,
             'pager' => $pager->makeLinks($page, $perPage, $total, 'bootstrap_full'),
@@ -54,6 +58,7 @@ class DashboardController extends BaseController
     public function makeAdmin($id)
     {
         $userModel = new UserModel();
+        $getTeamByMember = new TeamMemberModel();
         $user = $userModel->find($id);
 
         if (!$user) {
@@ -63,6 +68,12 @@ class DashboardController extends BaseController
             ])->setStatusCode(404);
         }
         // cek jika user sudah admin
+        if ($getTeamByMember->getTeamByMember($id)) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'User adalah atlit, tidak bisa dijadikan admin',
+            ])->setStatusCode(400);
+        }
         if ($user['role'] === 'admin') {            
             $userModel->update($id, ['role' => 'member']);
             return $this->response->setJSON([
@@ -70,6 +81,7 @@ class DashboardController extends BaseController
                 'message' => $user['name'].' berhasil dijadikan member',
             ]);
         }else{
+            
             $userModel->update($id, ['role' => 'admin']);
             return $this->response->setJSON([
                 'status' => 'success',
@@ -83,8 +95,9 @@ class DashboardController extends BaseController
     public function teams()
     {
         $teamModel = new TeamModel();
-        $teams = $teamModel->getTeamsWithOwner(); // kamu bisa custom join owner
-        return view('admin/teams', ['teams' => $teams]);
+        $teams = $teamModel->getTeamsWithOwner()->paginate(10, 'group1'); // kamu bisa custom join owner
+        $pager = $teamModel->pager;
+        return view('admin/teams', ['teams' => $teams, 'pager' => $pager]);
     }
     public function users()
     {
@@ -125,5 +138,19 @@ class DashboardController extends BaseController
         $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         return substr(str_shuffle(str_repeat($chars, ceil($length / strlen($chars)))), 0, $length);
     }
-    
+    public function search()
+{
+    $q = $this->request->getGet('q');
+    if (strlen($q) < 3) {
+        return $this->response->setJSON([]);
+    }
+
+    $users = new UserModel();
+    $users = $users->like('name', $q)
+                   ->orLike('email', $q)
+                   ->findAll();
+
+    return $this->response->setJSON($users);
+}
+
 }

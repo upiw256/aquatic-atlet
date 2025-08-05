@@ -5,6 +5,7 @@ namespace App\Controllers\Admin;
 use App\Controllers\BaseController;
 use App\Models\TeamModel;
 use App\Models\UserModel;
+use App\Models\TeamMemberModel;
 use Ramsey\Uuid\Uuid;
 
 class TeamController extends BaseController
@@ -33,6 +34,7 @@ class TeamController extends BaseController
     {
         $teamModel = new TeamModel();
         $userModel = new UserModel();
+        $teamMemberModel = new TeamMemberModel();
 
         $teamId = $this->request->getPost('team_id');
         // $userId = $this->request->getPost('user_id');
@@ -42,6 +44,14 @@ class TeamController extends BaseController
         if (!$team) {
             return redirect()->back()->with('error', 'Tim tidak ditemukan.');
         }
+        // Cek apakah user sudah menjadi anggota tim
+        if ($teamMemberModel->isMemberInTeam($teamId, $userId)) {
+            return redirect()->back()->with('error', 'User sudah menjadi anggota tim ini.');
+        }
+
+        if ($teamMemberModel->getTeamByMember($userId)) {
+            return redirect()->back()->with('error', 'User sudah menjadi anggota tim lain.');
+        }
 
         $db = \Config\Database::connect();
         $db->transStart();
@@ -49,7 +59,7 @@ class TeamController extends BaseController
         // Jika tim sudah punya owner, jadikan role-nya member
         if (!empty($team['owner_id'])) {
             $userModel->update($team['owner_id'], ['role' => 'member']);
-        }
+        }        
 
         // Update tim dengan owner baru (user id dari URL)
         $teamModel->update($teamId, ['owner_id' => $userId]);

@@ -21,9 +21,9 @@
                     <td><?= $i + 1 + ($perPage * ($page - 1)) ?></td>
                     <td class="nama"><?= esc($member['name']) ?></td>
                     <td class="email"><?= esc($member['email']) ?></td>
-                    <td><?= esc($member['role']) ?> <?= esc($member['team_name'] ?? '-') ?></td>
+                    <td><?= esc($member['role']) ?> <?= esc($member['team']['name'] ?? $member['team_name']) ?></td>
                     <td>
-                        <?php if ($member['role'] === 'member'): ?>
+                        <?php if ($member['team'] === null && strtolower(trim($member['role'])) !== 'owner'): ?>
                             <a href="/admin/assign-owner/<?= $member['id'] ?>" class="btn btn-sm btn-warning">Jadikan Owner</a>
                         <?php else: ?>
                             <span class="text-muted">-</span>

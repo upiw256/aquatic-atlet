@@ -18,7 +18,7 @@
         <tbody>
             <?php foreach ($teams as $i => $team): ?>
                 <tr>
-                    <td><?= $i + 1 ?></td>
+                    <td><?= $i = $i+1  ?></td>
                     <td><?= esc($team['name']) ?></td>
                     <td><?= esc($team['owner_name'] === null ? '-' : $team['owner_name']) ?></td>
                     <td><?= esc($team['member_count']) ?></td>
@@ -31,5 +31,8 @@
             <?php endforeach ?>
         </tbody>
     </table>
+    <div class="mt-3">
+    <?= $pager->links('group1', 'bootstrap_full') ?>
+</div>
 </div>
 <?= $this->endSection() ?>
