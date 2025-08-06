@@ -41,6 +41,9 @@ $routes->get('/admin/teams/create', 'Admin\TeamController::create', ['filter' =>
 $routes->post('/admin/teams/store', 'Admin\TeamController::store', ['filter' => 'role:admin']);
 $routes->get('/admin/assign-owner/(:segment)', 'Admin\TeamController::assignOwnerForm/$1', ['filter' => 'role:admin']);
 $routes->post('/admin/assign-owner/(:segment)', 'Admin\TeamController::assignOwner/$1', ['filter' => 'role:admin']);
+$routes->get('/admin/achivements', 'Admin\AchivementController::index', ['filter' => 'role:admin']);
+$routes->get('/admin/achivement/create', 'Admin\AchivementController::create', ['filter' => 'role:admin']);
+$routes->post('/admin/achivement/save', 'Admin\AchivementController::store', ['filter' => 'role:admin']);
 
 // Owner
 $routes->post('/owner/dashboard/update-role', 'Owner\DashboardController::updateRole', ['filter' => 'role:owner']);
