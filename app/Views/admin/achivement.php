@@ -1,0 +1,147 @@
+<?= $this->extend('layouts/admin_layout') ?>
+<?= $this->section('content') ?>
+
+<div class="container mt-4">
+    <h2>Daftar Atlit dan Kejuaraan</h2>
+    <div class="mb-3">
+        <a href="<?= site_url('admin/achivement/create') ?>" class="btn btn-primary">Tambah Kejuaraan</a>
+    </div>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Nama Atlit</th>
+                <th>Team</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php if (empty($achievements)): ?>
+                <tr>
+                    <td colspan="4" class="text-center">Tidak ada data</td>
+                </tr>
+            <?php else: ?>
+                <?php $i = 1;
+                foreach ($achievements as $achievement): ?>
+                    <tr>
+                        <td><?= $i++ ?></td>
+                        <td><?= esc($achievement['member_name']) ?></td>
+                        <td><?= esc($achievement['team_name']) ?></td>
+                        <td>
+                            <button
+                                onclick="showAchievements('<?= $achievement['team_member_id'] ?>')"
+                                class="btn btn-sm btn-info">
+                                Lihat
+                            </button>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </tbody>
+    </table>
+</div>
+<script>
+    const achievementsData = <?= json_encode($achievements) ?>;
+
+function showAchievements(memberId) {
+    const data = achievementsData[memberId];
+    if (!data || !data.achievements || data.achievements.length === 0) {
+        Swal.fire({
+            icon: 'info',
+            title: `${data?.member_name || 'Tidak diketahui'}`,
+            text: 'Belum ada data kejuaraan.',
+        });
+        return;
+    }
+
+    let tableHTML = `
+<div class="table-responsive">
+    <table class="table table-bordered" style="width:100%; text-align:left">
+        <thead class="table-light">
+            <tr>
+                <th>Nama Kejuaraan</th>
+                <th class="d-none d-sm-table-cell">Lokasi</th>
+                <th class="d-none d-sm-table-cell">Tingkat</th>
+                <th>Tahun</th>
+                <th>Posisi Akhir</th>
+                <th class="d-none d-sm-table-cell">Skor</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>`;
+
+data.achievements.forEach(a => {
+    tableHTML += `
+        <tr>
+            <td>${a.nama_kejuaraan}</td>
+            <td class="d-none d-sm-table-cell">${a.lokasi}</td>
+            <td class="d-none d-sm-table-cell">${a.tingkat}</td>
+            <td>${a.tahun}</td>
+            <td>${a.posisi_akhir}</td>
+            <td class="d-none d-sm-table-cell">${a.skor ?? '-'}</td>
+            <td>
+                <a href="<?= base_url() ?>admin/achivements/edit/${a.id}" class="btn btn-sm btn-warning mb-1">Edit</a>
+                <button class="btn btn-sm btn-danger" onclick="confirmDelete('${a.id}')">Hapus</button>
+            </td>
+        </tr>`;
+});
+
+tableHTML += `
+        </tbody>
+    </table>
+</div>`;
+
+
+    Swal.fire({
+        title: `${data.member_name}`,
+        html: tableHTML,
+        width: '90%',
+        customClass: {
+            popup: 'text-start'
+        }
+    });
+}
+
+function confirmDelete(id) {
+    Swal.fire({
+        title: 'Yakin ingin menghapus?',
+        text: "Data kejuaraan akan dihapus secara permanen!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Buat form DELETE dan submit
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `<?= base_url() ?>admin/achivements/delete/${id}`;
+
+            // Tambahkan spoofing method DELETE
+            const methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = '_method';
+            methodInput.value = 'DELETE';
+            form.appendChild(methodInput);
+
+            // Tambahkan CSRF token jika pakai CSRF protection di CodeIgniter
+            <?php if (csrf_token()) : ?>
+                const csrfName = '<?= csrf_token() ?>';
+                const csrfHash = '<?= csrf_hash() ?>';
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = csrfName;
+                csrfInput.value = csrfHash;
+                form.appendChild(csrfInput);
+            <?php endif; ?>
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
+}
+
+</script>
+<?= $this->endSection() ?>

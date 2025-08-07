@@ -7,16 +7,16 @@
     <base href="<?= base_url() ?>/">
     <title><?= $title ?? 'Member Area' ?></title>
     <!-- Styles -->
-<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" /> -->
-<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" /> -->
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
-<!-- Or for RTL support -->
-<!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.rtl.min.css" /> -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" /> -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" /> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+    <!-- Or for RTL support -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.rtl.min.css" /> -->
 
-<!-- Scripts -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.slim.min.js"></script> -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script> -->
-<!-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> -->
+    <!-- Scripts -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.slim.min.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> -->
     <link rel="shortcut icon" type="image/png" href="../assets/images/logo-aquatic.png" />
     <link rel="stylesheet" href="../assets/css/styles.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -69,6 +69,12 @@
                             <a class="sidebar-link" href="/admin/users" aria-expanded="false">
                                 <i class="ti ti-users"></i>
                                 <span class="hide-menu">User Management</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="/admin/achivements" aria-expanded="false">
+                                <i class="ti ti-trophy"></i>
+                                <span class="hide-menu">Penghargaan</span>
                             </a>
                         </li>
                     </ul>
@@ -173,101 +179,100 @@
         <?php endif; ?>
     </script>
     <script>
-function confirmJadikanAdmin(userId, userName) {
-  Swal.fire({
-    title: 'Yakin akan merubah role?',
-    text:` ${userName} akan Merubah role.`,
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Ya, Setuju!',
-    cancelButtonText: 'Batal'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      fetch(`/admin/makeadmin/${userId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': '<?= csrf_hash() ?>'
+        function confirmJadikanAdmin(userId, userName) {
+            Swal.fire({
+                title: 'Yakin akan merubah role?',
+                text: ` ${userName} akan Merubah role.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Setuju!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/admin/makeadmin/${userId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '<?= csrf_hash() ?>'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                Swal.fire({
+                                    title: 'Berhasil!',
+                                    html: data.message,
+                                    icon: 'success'
+                                }).then(() => {
+                                    location.reload(); // reload seluruh halaman
+                                });
+                            } else {
+                                Swal.fire('Error', data.message, 'error');
+                            }
+                        })
+                        .catch(err => {
+                            Swal.fire('Error', `Terjadi kesalahan saat menghubungi server. ${err}`, 'error');
+                        });
+                }
+            });
         }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.status === 'success') {
-          Swal.fire({
-            title: 'Berhasil!',
-            html: data.message,
-            icon: 'success'
-          }).then(() => {
-            location.reload(); // reload seluruh halaman
-        });
-        } else {
-          Swal.fire('Error', data.message, 'error');
-        }
-      })
-      .catch(err => {
-        Swal.fire('Error', `Terjadi kesalahan saat menghubungi server. ${err}`, 'error');
-      });
-    }
-  });
-}
     </script>
     <script>
-function resetPassword(userId) {
-  Swal.fire({
-    title: 'Reset Password?',
-    text: "Password akan diganti secara acak.",
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonText: 'Ya, Reset!',
-    cancelButtonText: 'Batal'
-  }).then((result) => {
-    if (result.isConfirmed) {
-      fetch(`/admin/users/reset/${userId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-CSRF-TOKEN': '<?= csrf_hash() ?>'
+        function resetPassword(userId) {
+            Swal.fire({
+                title: 'Reset Password?',
+                text: "Password akan diganti secara acak.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Reset!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/admin/users/reset/${userId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '<?= csrf_hash() ?>'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                Swal.fire({
+                                    title: 'Berhasil!',
+                                    html: `Password baru: <strong>${data.new_password}</strong>`,
+                                    icon: 'success'
+                                });
+                            } else {
+                                Swal.fire('Error', data.message, 'error');
+                            }
+                        })
+                        .catch(err => {
+                            Swal.fire('Error', 'Terjadi kesalahan saat menghubungi server.', 'error');
+                        });
+                }
+            });
         }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.status === 'success') {
-          Swal.fire({
-            title: 'Berhasil!',
-            html: `Password baru: <strong>${data.new_password}</strong>`,
-            icon: 'success'
-          });
-        } else {
-          Swal.fire('Error', data.message, 'error');
-        }
-      })
-      .catch(err => {
-        Swal.fire('Error', 'Terjadi kesalahan saat menghubungi server.', 'error');
-      });
-    }
-  });
-}
 
 
 
 
 
 
-// document.getElementById('searchInput').addEventListener('keyup', function () {
-//     const keyword = this.value.toLowerCase();
-//     const rows = document.querySelectorAll('#userTable tbody tr');
+        // document.getElementById('searchInput').addEventListener('keyup', function () {
+        //     const keyword = this.value.toLowerCase();
+        //     const rows = document.querySelectorAll('#userTable tbody tr');
 
-//     rows.forEach(row => {
-//         const nama = row.querySelector('.nama').textContent.toLowerCase();
-//         const email = row.querySelector('.email').textContent.toLowerCase();
+        //     rows.forEach(row => {
+        //         const nama = row.querySelector('.nama').textContent.toLowerCase();
+        //         const email = row.querySelector('.email').textContent.toLowerCase();
 
-//         const cocok = nama.includes(keyword) || email.includes(keyword);
+        //         const cocok = nama.includes(keyword) || email.includes(keyword);
 
-//         row.style.display = cocok ? '' : 'none';
-//     });
-// });
-
-</script>
+        //         row.style.display = cocok ? '' : 'none';
+        //     });
+        // });
+    </script>
 </body>
 
 </html>
