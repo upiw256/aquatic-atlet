@@ -66,21 +66,47 @@ class AchivementController extends BaseController
     public function store()
     {
         $achivementModel = new Achivement();
-        $data = [
-            'id' => Uuid::uuid4()->toString(),
-            'member_id' => $this->request->getVar('member_id'),
-            'nama_kejuaraan' => $this->request->getVar('nama_kejuaraan'),
-            'lokasi' => $this->request->getVar('lokasi'),
-            'tingkat' => $this->request->getVar('tingkat'),
-            'tahun' => $this->request->getVar('tahun'),
-            'posisi_akhir' => $this->request->getVar('posisi_akhir'),
-            'skor' => $this->request->getVar('score'),
-        ];
+    $data = [
+        'id' => $this->request->getVar('id') ?? Uuid::uuid4()->toString(),
+        'member_id' => $this->request->getVar('member_id'),
+        'nama_kejuaraan' => $this->request->getVar('nama_kejuaraan'),
+        'lokasi' => $this->request->getVar('lokasi'),
+        'tingkat' => $this->request->getVar('tingkat'),
+        'tahun' => $this->request->getVar('tahun'),
+        'posisi_akhir' => $this->request->getVar('posisi_akhir'),
+        'skor' => $this->request->getVar('score'),
+    ];
         // dd($data);
-        if ($achivementModel->insert($data)) {
+        if ($achivementModel->save($data)) {
             return redirect()->to(site_url('admin/achivements'))->with('success', 'Achievement created successfully');
         } else {
             return redirect()->back()->withInput()->with('errors', $achivementModel->errors());
         }
+    }
+    public function edit($id) {
+        $achivement = new Achivement();
+        $achivements = $achivement->getByMemberId($id);
+        $data = [
+            'title' => 'Create Achievement',
+            'active' => 'achievements',
+            'achivements' => $achivements,
+        ];
+        return view('admin/edit_achievement',$data);
+    }
+    public function delete($id)
+    {
+        $model = new Achivement();
+
+        $achievement = $model->find($id);
+
+        if (!$achievement) {
+            return redirect()->back()->with('error', 'Data kejuaraan tidak ditemukan.');
+        }
+
+        if ($model->delete($id)) {
+            return redirect()->to(site_url('admin/achivements'))->with('success', 'Data kejuaraan berhasil dihapus.');
+        } else {
+            return redirect()->back()->with('error', 'Gagal menghapus data kejuaraan.');
+        }    
     }
 }

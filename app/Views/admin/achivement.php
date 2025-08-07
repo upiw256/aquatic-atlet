@@ -55,37 +55,42 @@ function showAchievements(memberId) {
     }
 
     let tableHTML = `
-<table class="table table-bordered" style="width:100%; text-align:left">
-<thead>
-    <tr>
-        <th>Nama Kejuaraan</th>
-        <th>Lokasi</th>
-        <th>Tingkat</th>
-        <th>Tahun</th>
-        <th>Posisi Akhir</th>
-        <th>Skor</th>
-        <th>Aksi</th>
-    </tr>
-</thead>
-<tbody>`;
+<div class="table-responsive">
+    <table class="table table-bordered" style="width:100%; text-align:left">
+        <thead class="table-light">
+            <tr>
+                <th>Nama Kejuaraan</th>
+                <th class="d-none d-sm-table-cell">Lokasi</th>
+                <th class="d-none d-sm-table-cell">Tingkat</th>
+                <th>Tahun</th>
+                <th>Posisi Akhir</th>
+                <th class="d-none d-sm-table-cell">Skor</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody>`;
 
-    data.achievements.forEach(a => {
-        tableHTML += `
-<tr>
-    <td>${a.nama_kejuaraan}</td>
-    <td>${a.lokasi}</td>
-    <td>${a.tingkat}</td>
-    <td>${a.tahun}</td>
-    <td>${a.posisi_akhir}</td>
-    <td>${a.skor ?? '-'}</td>
-    <td>
-        <a href="<?= base_url() ?>admin/achivements/edit/${a.id}" class="btn btn-sm btn-warning">Edit</a>
-        <a href="<?= base_url() ?>admin/achivements/delete/${a.id}" class="btn btn-sm btn-danger" onclick="return confirm('Yakin ingin menghapus kejuaraan ini?');">Hapus</a>
-    </td>
-</tr>`;
-    });
+data.achievements.forEach(a => {
+    tableHTML += `
+        <tr>
+            <td>${a.nama_kejuaraan}</td>
+            <td class="d-none d-sm-table-cell">${a.lokasi}</td>
+            <td class="d-none d-sm-table-cell">${a.tingkat}</td>
+            <td>${a.tahun}</td>
+            <td>${a.posisi_akhir}</td>
+            <td class="d-none d-sm-table-cell">${a.skor ?? '-'}</td>
+            <td>
+                <a href="<?= base_url() ?>admin/achivements/edit/${a.id}" class="btn btn-sm btn-warning mb-1">Edit</a>
+                <button class="btn btn-sm btn-danger" onclick="confirmDelete('${a.id}')">Hapus</button>
+            </td>
+        </tr>`;
+});
 
-    tableHTML += `</tbody></table>`;
+tableHTML += `
+        </tbody>
+    </table>
+</div>`;
+
 
     Swal.fire({
         title: `${data.member_name}`,
@@ -96,5 +101,47 @@ function showAchievements(memberId) {
         }
     });
 }
+
+function confirmDelete(id) {
+    Swal.fire({
+        title: 'Yakin ingin menghapus?',
+        text: "Data kejuaraan akan dihapus secara permanen!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#6c757d',
+        confirmButtonText: 'Ya, hapus!',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Buat form DELETE dan submit
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = `<?= base_url() ?>admin/achivements/delete/${id}`;
+
+            // Tambahkan spoofing method DELETE
+            const methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = '_method';
+            methodInput.value = 'DELETE';
+            form.appendChild(methodInput);
+
+            // Tambahkan CSRF token jika pakai CSRF protection di CodeIgniter
+            <?php if (csrf_token()) : ?>
+                const csrfName = '<?= csrf_token() ?>';
+                const csrfHash = '<?= csrf_hash() ?>';
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = csrfName;
+                csrfInput.value = csrfHash;
+                form.appendChild(csrfInput);
+            <?php endif; ?>
+
+            document.body.appendChild(form);
+            form.submit();
+        }
+    });
+}
+
 </script>
 <?= $this->endSection() ?>

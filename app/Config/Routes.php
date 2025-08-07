@@ -2,69 +2,71 @@
 
 use CodeIgniter\Router\RouteCollection;
 
-/**
- * @var RouteCollection $routes
- */
+/** @var RouteCollection $routes */
 
-// Home dan Auth
+// Auth & Home
 $routes->get('/', 'Home::index');
 $routes->get('/team-detail/(:segment)', 'Home::teamDetail/$1');
 $routes->get('/register', 'RegisterController::index');
 $routes->post('/register', 'RegisterController::store');
-
 $routes->get('/login', 'LoginController::index');
 $routes->post('/login', 'LoginController::authenticate');
 $routes->get('/logout', 'LoginController::logout');
 
-$routes->get('admin/users/search', 'Admin\DashboardController::search');
-
-// Dashboard umum (jika mau redirect)
+// Dashboard umum
 $routes->get('/dashboard', 'DashboardController::index', ['filter' => 'role:admin,owner,member']);
 
-// Dashboard per role
-$routes->get('/admin/dashboard', 'Admin\DashboardController::index', ['filter' => 'role:admin']);
-$routes->get('/owner/dashboard', 'Owner\DashboardController::index', ['filter' => 'role:owner']);
-$routes->get('/member/dashboard', 'Member\DashboardController::index', ['filter' => 'role:member']);
+// Admin Group
+$routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
+    $routes->get('/', 'Admin\DashboardController::index');
+    $routes->get('dashboard', 'Admin\DashboardController::index');
+    $routes->get('users/search', 'Admin\DashboardController::search');
+    $routes->get('users', 'Admin\DashboardController::users');
+    $routes->put('users/reset/(:segment)', 'Admin\DashboardController::usersReset/$1');
+    $routes->put('makeadmin/(:segment)', 'Admin\DashboardController::makeAdmin/$1');
+    $routes->get('members', 'Admin\DashboardController::members');
+    $routes->get('teams', 'Admin\DashboardController::teams');
 
-// Fitur lainnya
-$routes->get('/admin', 'Admin\DashboardController::index', ['filter' => 'role:admin']);
-$routes->get('/owner/team', 'OwnerTeamController::index', ['filter' => 'role:owner']);
-// $routes->get('/member/profile', 'MemberController::profile', ['filter' => 'role:member']);
+    // Teams
+    $routes->get('teams/create', 'Admin\TeamController::create');
+    $routes->post('teams/store', 'Admin\TeamController::store');
+    $routes->get('assign-owner/(:segment)', 'Admin\TeamController::assignOwnerForm/$1');
+    $routes->post('assign-owner/(:segment)', 'Admin\TeamController::assignOwner/$1');
 
-// Admin
-$routes->get('/admin/members', 'Admin\DashboardController::members', ['filter' => 'role:admin']);
-$routes->get('/admin/users', 'Admin\DashboardController::users', ['filter' => 'role:admin']);
-$routes->put('/admin/users/reset/(:segment)', 'Admin\DashboardController::usersReset/$1', ['filter' => 'role:admin']);
-$routes->put('/admin/makeadmin/(:segment)', 'Admin\DashboardController::makeAdmin/$1', ['filter' => 'role:admin']);
-$routes->get('/admin/teams', 'Admin\DashboardController::teams', ['filter' => 'role:admin']);
-$routes->get('/admin/teams/create', 'Admin\TeamController::create', ['filter' => 'role:admin']);
-$routes->post('/admin/teams/store', 'Admin\TeamController::store', ['filter' => 'role:admin']);
-$routes->get('/admin/assign-owner/(:segment)', 'Admin\TeamController::assignOwnerForm/$1', ['filter' => 'role:admin']);
-$routes->post('/admin/assign-owner/(:segment)', 'Admin\TeamController::assignOwner/$1', ['filter' => 'role:admin']);
-$routes->get('/admin/achivements', 'Admin\AchivementController::index', ['filter' => 'role:admin']);
-$routes->get('/admin/achivement/create', 'Admin\AchivementController::create', ['filter' => 'role:admin']);
-$routes->post('/admin/achivement/save', 'Admin\AchivementController::store', ['filter' => 'role:admin']);
+    // Achievements
+    $routes->get('achivements', 'Admin\AchivementController::index');
+    $routes->get('achivement/create', 'Admin\AchivementController::create');
+    $routes->post('achivement/save', 'Admin\AchivementController::store');
+    $routes->get('achivements/edit/(:segment)', 'Admin\AchivementController::edit/$1');
+    $routes->delete('achivements/delete/(:segment)', 'Admin\AchivementController::delete/$1');
 
-// Owner
-$routes->post('/owner/dashboard/update-role', 'Owner\DashboardController::updateRole', ['filter' => 'role:owner']);
-$routes->post('/owner/team/add', 'Owner\DashboardController::addMember', ['filter' => 'role:owner']);
-$routes->post('/owner/dashboard/remove-member', 'Owner\DashboardController::removeMember', ['filter' => 'role:owner']);
-$routes->get('/owner/team/edit/(:segment)', 'Owner\DashboardController::edit/$1', ['filter' => 'role:owner']);
-$routes->post('/owner/team/update/(:segment)', 'Owner\DashboardController::update/$1', ['filter' => 'role:owner']);
-$routes->get('/owner/profile', 'Owner\ProfileController::index', ['filter' => 'role:owner']);
-$routes->post('/owner/profile', 'Owner\ProfileController::update', ['filter' => 'role:owner']);
+    // Biodata
+    $routes->get('biodata/edit/(:uuid)', 'Admin\BiodataController::edit/$1');
+    $routes->post('biodata/save/(:uuid)', 'Admin\BiodataController::save/$1');
+});
 
-// Admin bisa edit semua
-$routes->get('/admin/biodata/edit/(:uuid)', 'Admin\BiodataController::edit/$1', ['filter' => 'role:admin']);
-$routes->post('/admin/biodata/save/(:uuid)', 'Admin\BiodataController::save/$1', ['filter' => 'role:admin']);
+// Owner Group
+$routes->group('owner', ['filter' => 'role:owner'], function ($routes) {
+    $routes->get('dashboard', 'Owner\DashboardController::index');
+    $routes->post('dashboard/update-role', 'Owner\DashboardController::updateRole');
+    $routes->post('dashboard/remove-member', 'Owner\DashboardController::removeMember');
+    $routes->post('team/add', 'Owner\DashboardController::addMember');
+    $routes->get('team/edit/(:segment)', 'Owner\DashboardController::edit/$1');
+    $routes->post('team/update/(:segment)', 'Owner\DashboardController::update/$1');
+    $routes->get('team', 'OwnerTeamController::index');
 
-// Owner
-$routes->get('/owner/profile', 'Owner\ProfileController::index', ['filter' => 'role:owner']);
-$routes->post('/owner/profile/save', 'Owner\ProfileController::save', ['filter' => 'role:owner']);
+    // Profile
+    $routes->get('profile', 'Owner\ProfileController::index');
+    $routes->post('profile', 'Owner\ProfileController::update');
+    $routes->post('profile/save', 'Owner\ProfileController::save');
+});
 
-// Member
-$routes->get('/member/profile', 'Member\ProfileController::index', ['filter' => 'role:member']);
-$routes->post('/member/profile/save', 'Member\ProfileController::save', ['filter' => 'role:member']);
-$routes->get('/member/accept-invite/(:segment)', 'Member\DashboardController::acceptInvite/$1', ['filter' => 'role:member']);
-$routes->get('/member/reject-invite/(:segment)', 'Member\DashboardController::rejectInvite/$1', ['filter' => 'role:member']);
-$routes->get('/member/leave-team', 'Member\DashboardController::leaveTeam', ['filter' => 'role:member']);
+// Member Group
+$routes->group('member', ['filter' => 'role:member'], function ($routes) {
+    $routes->get('dashboard', 'Member\DashboardController::index');
+    $routes->get('profile', 'Member\ProfileController::index');
+    $routes->post('profile/save', 'Member\ProfileController::save');
+    $routes->get('accept-invite/(:segment)', 'Member\DashboardController::acceptInvite/$1');
+    $routes->get('reject-invite/(:segment)', 'Member\DashboardController::rejectInvite/$1');
+    $routes->get('leave-team', 'Member\DashboardController::leaveTeam');
+});
