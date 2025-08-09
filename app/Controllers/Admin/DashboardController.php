@@ -28,8 +28,6 @@ class DashboardController extends BaseController
         // Ambil query builder
         $builder = $userModel->getMembersWithTeam();
         
-        // Jalankan pagination manual
-        $perPage = 10;
         $page = $this->request->getVar('page') ?? 1;
 
         // Hitung total data
@@ -37,21 +35,15 @@ class DashboardController extends BaseController
 
         // Ambil data paginated
         $members = $builder
-            ->limit($perPage, ($page - 1) * $perPage)
             ->get()
             ->getResultArray();
 
-        // Set up pagination bawaan
-        $pager = \Config\Services::pager();
         // dd($biodataTeamMemberModel);
         foreach ($members as &$member) {
             $member['team'] = $biodataTeamMemberModel->getTeamByMember($member['id']);
         }
         return view('admin/members', [
             'members' => $members,
-            'pager' => $pager->makeLinks($page, $perPage, $total, 'bootstrap_full'),
-            'page' => $page,
-            'perPage' => $perPage
         ]);
     }
 
@@ -95,16 +87,14 @@ class DashboardController extends BaseController
     public function teams()
     {
         $teamModel = new TeamModel();
-        $teams = $teamModel->getTeamsWithOwner()->paginate(10, 'group1'); // kamu bisa custom join owner
-        $pager = $teamModel->pager;
-        return view('admin/teams', ['teams' => $teams, 'pager' => $pager]);
+        $teams = $teamModel->getTeamsWithOwner();
+        return view('admin/teams', ['teams' => $teams]);
     }
     public function users()
     {
         $userModel = new UserModel();
         $data = [
-            'users' => $userModel->paginate(10,'group1'),       // ambil 10 data per halaman
-            'pager' => $userModel->pager               // kirim pager ke view
+            'users' => $userModel->findAll()               // kirim pager ke view
         ];
         return view('admin/users', $data);
     }

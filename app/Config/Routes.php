@@ -15,7 +15,8 @@ $routes->get('/logout', 'LoginController::logout');
 
 // Dashboard umum
 $routes->get('/dashboard', 'DashboardController::index', ['filter' => 'role:admin,owner,member']);
-
+$routes->get('/member/profile', 'Member\ProfileController::index', ['filter' => 'role:admin,owner,member']);
+$routes->post('/member/profile/save', 'Member\ProfileController::save', ['filter' => 'role:admin,owner,member']);
 // Admin Group
 $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->get('/', 'Admin\DashboardController::index');
@@ -64,8 +65,6 @@ $routes->group('owner', ['filter' => 'role:owner'], function ($routes) {
 // Member Group
 $routes->group('member', ['filter' => 'role:member'], function ($routes) {
     $routes->get('dashboard', 'Member\DashboardController::index');
-    $routes->get('profile', 'Member\ProfileController::index');
-    $routes->post('profile/save', 'Member\ProfileController::save');
     $routes->get('accept-invite/(:segment)', 'Member\DashboardController::acceptInvite/$1');
     $routes->get('reject-invite/(:segment)', 'Member\DashboardController::rejectInvite/$1');
     $routes->get('leave-team', 'Member\DashboardController::leaveTeam');

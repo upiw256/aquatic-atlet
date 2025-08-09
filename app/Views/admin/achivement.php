@@ -56,8 +56,8 @@ function showAchievements(memberId) {
 
     let tableHTML = `
 <div class="table-responsive">
-    <table class="table table-bordered" style="width:100%; text-align:left">
-        <thead class="table-light">
+    <table class="table table-bordered table-striped display nowrap" id="penghargaaan">
+        <thead class="table-dark">
             <tr>
                 <th>Nama Kejuaraan</th>
                 <th class="d-none d-sm-table-cell">Lokasi</th>
@@ -90,7 +90,6 @@ tableHTML += `
         </tbody>
     </table>
 </div>`;
-
 
     Swal.fire({
         title: `${data.member_name}`,
@@ -142,6 +141,6 @@ function confirmDelete(id) {
         }
     });
 }
-
+ 
 </script>
 <?= $this->endSection() ?>

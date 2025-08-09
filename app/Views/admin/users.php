@@ -3,11 +3,6 @@
 <div class="container mt-4">
     <h1>Kelola User</h1>
 
-    <div class="input-group mb-3">
-        <input type="text" id="searchInput" class="form-control" placeholder="Cari nama atau email...">
-        <button class="btn btn-primary" id="searchButton">Cari</button>
-    </div>
-
     <table class="table table-bordered table-striped" id="userTable">
         <thead class="table-dark">
             <tr>
@@ -55,10 +50,6 @@
             <?php endforeach; ?>
         </tbody>
     </table>
-
-    <div class="d-flex justify-content-center">
-        <?= $pager->links('group1','bootstrap_full') ?>
-    </div>
 </div>
 
 <script>

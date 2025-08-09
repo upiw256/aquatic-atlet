@@ -5,7 +5,7 @@
 
     <a href="/admin/teams/create" class="btn btn-primary mb-3">+ Buat Tim Baru</a>
 
-    <table class="table table-bordered table-striped">
+    <table id="team" class="table table-striped">
         <thead class="table-dark">
             <tr>
                 <th>#</th>
@@ -16,7 +16,7 @@
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($teams as $i => $team): ?>
+            <?php $i=0; foreach ($teams as $team): ?>
                 <tr>
                     <td><?= $i = $i+1  ?></td>
                     <td><?= esc($team['name']) ?></td>
@@ -31,8 +31,5 @@
             <?php endforeach ?>
         </tbody>
     </table>
-    <div class="mt-3">
-    <?= $pager->links('group1', 'bootstrap_full') ?>
-</div>
 </div>
 <?= $this->endSection() ?>

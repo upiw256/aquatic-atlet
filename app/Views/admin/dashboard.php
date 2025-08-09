@@ -26,6 +26,7 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 <h5 class="card-title">Statistik Pengguna</h5>
+                <!-- <div id="chart"></div> -->
                 <canvas id="statsChart" height="100"></canvas>
             </div>
         </div>

@@ -21,9 +21,12 @@
     <link rel="stylesheet" href="../assets/css/styles.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> -->
-    <script src=" https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js "></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js "></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/css/bootstrap.min.css"></link>
+    <link href="https://cdn.datatables.net/2.3.2/css/dataTables.bootstrap5.css"></link>
+    <link href="https://cdn.datatables.net/responsive/3.0.5/css/responsive.dataTables.css"></link>
 </head>
 
 <body>
@@ -77,6 +80,25 @@
                                 <span class="hide-menu">Penghargaan</span>
                             </a>
                         </li>
+                        
+                    </ul>
+                    <ul class="sidebar-nav mt-4">
+                        <li class="nav-small-cap">
+                            <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+                            <span class="hide-menu">Settings</span>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="/member/profile" aria-expanded="false">
+                                <i class="ti ti-ad-2"></i>
+                                <span class="hide-menu">Biodata</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="/logout" aria-expanded="false">
+                                <i class="ti ti-logout"></i>
+                                <span class="hide-menu">Logout</span>
+                            </a>
+                        </li>
                     </ul>
                 </nav>
                 <!-- End Sidebar navigation -->
@@ -127,9 +149,14 @@
     <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../assets/js/sidebarmenu.js"></script>
     <script src="../assets/js/app.min.js"></script>
-    <script src="../assets/libs/apexcharts/dist/apexcharts.min.js"></script>
+    <!-- <script src="../assets/libs/apexcharts/dist/apexcharts.min.js"></script> -->
     <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
-    <script src="../assets/js/dashboard.js"></script>
+    <!-- <script src="../assets/js/dashboard.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.bootstrap5.js"></script>
+    <script src="https://cdn.datatables.net/responsive/3.0.5/js/responsive.dataTables.js"></script>
+    <script src="https://cdn.datatables.net/responsive/3.0.5/js/dataTables.responsive.js"></script>
     <!-- solar icons -->
     <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
     <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
@@ -253,25 +280,20 @@
                 }
             });
         }
-
-
-
-
-
-
-        // document.getElementById('searchInput').addEventListener('keyup', function () {
-        //     const keyword = this.value.toLowerCase();
-        //     const rows = document.querySelectorAll('#userTable tbody tr');
-
-        //     rows.forEach(row => {
-        //         const nama = row.querySelector('.nama').textContent.toLowerCase();
-        //         const email = row.querySelector('.email').textContent.toLowerCase();
-
-        //         const cocok = nama.includes(keyword) || email.includes(keyword);
-
-        //         row.style.display = cocok ? '' : 'none';
-        //     });
-        // });
+        new DataTable('#team',{
+            responsive: {
+                details: {
+                    display: $.fn.dataTable.Responsive.display.childRowImmediate
+                }
+            }
+        });    
+        new DataTable('#userTable', {
+            responsive: {
+                details: {
+                    display: $.fn.dataTable.Responsive.display.childRowImmediate
+                }
+            }
+        });    
     </script>
 </body>
 

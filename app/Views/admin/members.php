@@ -2,10 +2,7 @@
 <?= $this->section('content') ?>
 <div class="container mt-4">
     <h1>Kelola Member</h1>
-    <div class="mb-3">
-        <input type="text" id="searchInput" class="form-control" placeholder="Cari nama atau email...">
-    </div>
-    <table class="table table-bordered table-striped" id="userTable">
+    <table class="table table-bordered table-striped display nowrap" id="userTable">
         <thead class="table-dark">
             <tr>
                 <th>#</th>
@@ -16,9 +13,9 @@
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($members as $i => $member): ?>
+            <?php $i=0; foreach ($members as $member): ?>
                 <tr>
-                    <td><?= $i + 1 + ($perPage * ($page - 1)) ?></td>
+                    <td><?= $i = $i + 1 ?></td>
                     <td class="nama"><?= esc($member['name']) ?></td>
                     <td class="email"><?= esc($member['email']) ?></td>
                     <td><?= esc($member['role']) ?> <?= esc($member['team']['name'] ?? $member['team_name']) ?></td>
@@ -33,9 +30,6 @@
             <?php endforeach ?>
         </tbody>
     </table>
-    <div class="d-flex justify-content-center">
-        <?= $pager ?>
-    </div>
 </div>
 
 
