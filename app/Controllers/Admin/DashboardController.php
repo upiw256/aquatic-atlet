@@ -23,11 +23,11 @@ class DashboardController extends BaseController
     }
     public function members()
     {
-    $userModel = new UserModel();
-    $biodataTeamMemberModel = new TeamMemberModel();
+        $userModel = new UserModel();
+        $biodataTeamMemberModel = new TeamMemberModel();
         // Ambil query builder
         $builder = $userModel->getMembersWithTeam();
-        
+
         $page = $this->request->getVar('page') ?? 1;
 
         // Hitung total data
@@ -66,21 +66,20 @@ class DashboardController extends BaseController
                 'message' => 'User adalah atlit, tidak bisa dijadikan admin',
             ])->setStatusCode(400);
         }
-        if ($user['role'] === 'admin') {            
+        if ($user['role'] === 'admin') {
             $userModel->update($id, ['role' => 'member']);
             return $this->response->setJSON([
                 'status' => 'success',
-                'message' => $user['name'].' berhasil dijadikan member',
+                'message' => $user['name'] . ' berhasil dijadikan member',
             ]);
-        }else{
-            
+        } else {
+
             $userModel->update($id, ['role' => 'admin']);
             return $this->response->setJSON([
                 'status' => 'success',
-                'message' => $user['name'].' berhasil dijadikan admin',
+                'message' => $user['name'] . ' berhasil dijadikan admin',
             ]);
         }
-
     }
 
 
@@ -88,7 +87,13 @@ class DashboardController extends BaseController
     {
         $teamModel = new TeamModel();
         $teams = $teamModel->getTeamsWithOwner();
-        return view('admin/teams', ['teams' => $teams]);
+        $members = new TeamMemberModel();
+        $anggota = [];
+        foreach ($teams as $team) {
+            $anggota[$team['id']] = $members->getMembersByTeam($team['id']);
+        }
+
+        return view('admin/teams', ['teams' => $teams, 'anggota' => $anggota]);
     }
     public function users()
     {
@@ -124,23 +129,23 @@ class DashboardController extends BaseController
             'new_password' => $newPassword,
         ]);
     }
-    function generateRandomPassword($length = 12) {
+    function generateRandomPassword($length = 12)
+    {
         $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
         return substr(str_shuffle(str_repeat($chars, ceil($length / strlen($chars)))), 0, $length);
     }
     public function search()
-{
-    $q = $this->request->getGet('q');
-    if (strlen($q) < 3) {
-        return $this->response->setJSON([]);
+    {
+        $q = $this->request->getGet('q');
+        if (strlen($q) < 3) {
+            return $this->response->setJSON([]);
+        }
+
+        $users = new UserModel();
+        $users = $users->like('name', $q)
+            ->orLike('email', $q)
+            ->findAll();
+
+        return $this->response->setJSON($users);
     }
-
-    $users = new UserModel();
-    $users = $users->like('name', $q)
-                   ->orLike('email', $q)
-                   ->findAll();
-
-    return $this->response->setJSON($users);
-}
-
 }

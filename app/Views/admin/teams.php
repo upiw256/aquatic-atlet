@@ -16,20 +16,83 @@
             </tr>
         </thead>
         <tbody>
-            <?php $i=0; foreach ($teams as $team): ?>
+            <?php $i = 0;
+            foreach ($teams as $team): ?>
                 <tr>
-                    <td><?= $i = $i+1  ?></td>
+                    <td><?= $i = $i + 1  ?></td>
                     <td><?= esc($team['name']) ?></td>
                     <td><?= esc($team['owner_name'] === null ? '-' : $team['owner_name']) ?></td>
                     <td><?= esc($team['member_count']) ?></td>
                     <td>
-                        <a href="/admin/teams/<?= $team['id'] ?>" class="btn btn-sm btn-info">Detail</a>
-                        <a href="/admin/teams/<?= $team['id'] ?>/edit" class="btn btn-sm btn-warning">Edit</a>
-                        <a href="/admin/teams/<?= $team['id'] ?>/delete" class="btn btn-sm btn-danger" onclick="return confirm('Hapus tim ini?')">Hapus</a>
+                        <button
+                            onclick="showMembers('<?= $team['id'] ?>')"
+                            class="btn btn-sm btn-info">
+                            Lihat
+                        </button>
+                        <a href="/admin/teams/edit/<?= $team['id'] ?>" class="btn btn-sm btn-warning">Edit</a>
+                        <a href="/admin/teams/<?= $team['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Hapus tim ini?')">Hapus</a>
                     </td>
                 </tr>
             <?php endforeach ?>
         </tbody>
     </table>
 </div>
+
+<script>
+    const membersData = <?= json_encode($team) ?>;
+    // console.log(membersData);
+    function showMembers(teamId) {
+        const data = membersData.id;
+        console.log(data);
+        if (!data || !data.members || data.members.length === 0) {
+            Swal.fire({
+                icon: 'info',
+                title: 'Tidak ada anggota tim',
+                text: 'Tim ini belum memiliki anggota.',
+            });
+            return;
+        }
+
+        let tableHTML = `
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped display nowrap" id="membersTable">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Nama Atlit</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+
+        data.members.forEach((member, index) => {
+            tableHTML += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${member.name}</td>
+                    <td>${member.email}</td>
+                    <td>${member.role}</td>
+                </tr>`;
+        });
+
+        tableHTML += `
+                    </tbody>
+                </table>
+            </div>`;
+
+        Swal.fire({
+            title: `Anggota Tim ${data.team_name}`,
+            html: tableHTML,
+            showCloseButton: true,
+            focusConfirm: false,
+            confirmButtonText: 'Tutup',
+        });
+
+        $('#membersTable').DataTable({
+            responsive: true,
+            autoWidth: false,
+        });
+    }
+</script>
 <?= $this->endSection() ?>

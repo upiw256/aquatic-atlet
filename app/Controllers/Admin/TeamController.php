@@ -144,4 +144,140 @@ class TeamController extends BaseController
 
         return redirect()->to('/admin/teams')->with('success', 'Tim berhasil ditambahkan!');
     }
+
+    public function update($id)
+    {
+        $teamModel = new TeamModel();
+        $team = $teamModel->find($id);
+        if (!$team) {
+            return redirect()->to('/admin/teams')->with('error', 'Tim tidak ditemukan.');
+        }
+
+        $validation = \Config\Services::validation();
+        $logoFile   = $this->request->getFile('logo');
+
+        // Cek apakah ada file yang diupload dan valid
+        $uploadedExtension = ($logoFile && $logoFile->isValid() && !$logoFile->hasMoved())
+            ? $logoFile->getClientExtension()
+            : null;
+
+        // Format default pesan error (jika format tidak valid)
+        $formatErrorMessage = 'Format logo harus PNG, JPG, atau JPEG.';
+        if ($uploadedExtension) {
+            $formatErrorMessage .= ' Format yang Anda unggah: ' . $uploadedExtension . '.';
+        }
+
+        $rules = [
+            'name' => 'required|min_length[3]',
+            'owner_id' => 'permit_empty|is_not_unique[users.id]',
+            'description' => 'permit_empty|min_length[10]',
+            'logo' => [
+                'rules' => 'permit_empty|ext_in[logo,png,jpg,jpeg]|max_size[logo,2048]',
+                'label' => 'Logo Tim',
+                'errors' => [
+                    'ext_in'    => $formatErrorMessage,
+                    'max_size'  => 'Ukuran logo maksimal 2MB.',
+                ],
+            ],
+        ];
+
+        if (!$this->validate($rules)) {
+            return redirect()->back()->withInput()->with('error', implode(', ', $validation->getErrors()));
+        }
+
+        $owners = $this->request->getPost('owner_id');
+        $owners = $owners === '' ? null : $owners;
+
+        $logoName = $team['logo'];
+        if ($logoFile && $logoFile->isValid() && !$logoFile->hasMoved()) {
+            $logoName = $logoFile->getRandomName();
+            $logoFile->move(ROOTPATH . 'public/uploads/logo/', $logoName);
+        }
+
+        $teamModel->update($id, [
+            'name'        => $this->request->getPost('name'),
+            'owner_id'    => $owners,
+            'description' => $this->request->getPost('description'),
+            'logo'        => $logoName,
+        ]);
+        // Jika ada owner yang dipilih, update role-nya jadi owner
+        if ($owners) {
+            $userModel = new UserModel();
+            $user = $userModel->find($owners);
+            if ($user) {
+                $userModel->update($owners, ['role' => 'owner']);
+            }
+        }
+
+        return redirect()->to('/admin/teams')->with('success', 'Tim berhasil diperbarui!');
+    }
+
+    public function delete($id)
+    {
+        $teamModel = new TeamModel();
+        $team = $teamModel->find($id);
+        if (!$team) {
+            return redirect()->to('/admin/teams')->with('error', 'Tim tidak ditemukan.');
+        }
+
+        $teamModel->delete($id);
+
+        return redirect()->to('/admin/teams')->with('success', 'Tim berhasil dihapus!');
+    }
+
+    public function deleteLogo($id)
+    {
+        $teamModel = new TeamModel();
+        $team = $teamModel->find($id);
+        if (!$team) {
+            return redirect()->to('/admin/teams')->with('error', 'Tim tidak ditemukan.');
+        }
+
+        $logoPath = ROOTPATH . 'public/uploads/logo/' . $team['logo'];
+        if (file_exists($logoPath)) {
+            unlink($logoPath);
+        }
+
+        $teamModel->update($id, ['logo' => null]);
+
+        return redirect()->to('/admin/teams')->with('success', 'Logo tim berhasil dihapus!');
+    }
+    public function edit($id)
+    {
+        $teamModel = new TeamModel();
+        $userModel = new UserModel();
+
+        $team = $teamModel->find($id);
+        if (!$team) {
+            return redirect()->to('/admin/teams')->with('error', 'Tim tidak ditemukan.');
+        }
+
+        // Ambil daftar owner yang bisa dipilih
+        $owners = $userModel->where('role', 'member')->findAll();
+        $users = $userModel->where('id', $team['owner_id'])->findAll();
+
+        return view('admin/teams/edit', [
+            'team' => $team,
+            'owners' => $owners,
+            'users' => $users
+        ]);
+    }
+    public function detail($id) 
+    {
+        $teamModel = new TeamModel();
+        $team = $teamModel->find($id);
+        if (!$team) {
+            return redirect()->to('/admin/teams')->with('error', 'Tim tidak ditemukan.');
+        }
+
+        // Ambil anggota tim
+        $teamMemberModel = new TeamMemberModel();
+        $members = $teamMemberModel->getMembersByTeam($id);
+
+        return view('admin/teams/detail', [
+            'team' => $team,
+            'members' => $members
+        ]);
+        
+    }
 }
