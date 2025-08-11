@@ -108,6 +108,8 @@ class DashboardController extends BaseController
             $groupedTeams[] = [
                 'id'           => $team['id'],
                 'name'         => $team['name'],
+                'description'  => $team['description'],
+                'logo'         => $team['logo'],
                 'owner_name'   => $team['owner_name'],
                 'owner_email'  => $team['owner_email'],
                 'member_count' => count($members),

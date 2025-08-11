@@ -36,6 +36,8 @@ class TeamModel extends Model
         return $this->select("
         teams.id,
         teams.name,
+        teams.description,
+        teams.logo,
         owner.name AS owner_name,
         owner.email AS owner_email,
         string_agg(

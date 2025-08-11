@@ -16,7 +16,8 @@
             </tr>
         </thead>
         <tbody>
-            <?php $i = 0; foreach ($teams as $team): ?>
+            <?php $i = 0;
+            foreach ($teams as $team): ?>
                 <tr>
                     <td><?= ++$i ?></td>
                     <td><?= esc($team['name']) ?></td>
@@ -41,57 +42,50 @@
     const membersData = <?= json_encode($teams) ?>;
 
     function showMembers(teamId) {
-        const data = membersData.find(team => team.id == teamId);
-
-        if (!data || !data.members || data.members.length === 0) {
-            Swal.fire({
-                icon: 'info',
-                title: 'Tidak ada anggota tim',
-                text: 'Tim ini belum memiliki anggota.',
-            });
-            return;
-        }
+        const team = membersData.find(t => t.id === teamId);
+        if (!team) return;
 
         let tableHTML = `
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped display nowrap" id="membersTable">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>#</th>
-                            <th>Nama Atlit</th>
-                            <th>Email</th>
-                            <th>Role</th>
-                        </tr>
-                    </thead>
-                    <tbody>`;
-
-        data.members.forEach((member, index) => {
-            tableHTML += `
+        <div class="row">
+            <div class="col-md-2 text-center">
+            ${team.logo 
+            ? `<img src="uploads/logo/${team.logo}" alt="Logo Tim" style="max-width: 120px;">`
+            : 'Tidak ada logo'}
+            </div>
+            <div class="col-md-10">
+                <p>${team.description || 'Tidak ada deskripsi'}</p>
+            </div>
+        </div>
+        <table id="membersTable" class="table table-bordered table-striped">
+            <thead>
                 <tr>
-                    <td>${index + 1}</td>
-                    <td>${member.name}</td>
-                    <td>${member.email}</td>
-                    <td>${member.role}</td>
-                </tr>`;
-        });
-
-        tableHTML += `
-                    </tbody>
-                </table>
-            </div>`;
+                    <th>#</th>
+                    <th>Nama Atlit</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${team.members.map((m, i) => `
+                    <tr>
+                        <td>${i + 1}</td>
+                        <td>${m.name}</td>
+                        <td>${m.email}</td>
+                        <td>${m.role}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+    `;
 
         Swal.fire({
-            title: `Anggota Tim ${data.name}`,
-            html: `<div style="max-height:400px; overflow-y:auto;">${tableHTML}</div>`,
+            title: `Anggota Tim ${team.name}`,
+            html: tableHTML,
             width: '800px',
-            showCloseButton: true,
-            focusConfirm: false,
-            confirmButtonText: 'Tutup',
-        });
-
-        $('#membersTable').DataTable({
-            responsive: true,
-            autoWidth: false,
+            heightAuto: false,
+            didOpen: () => {
+                new DataTable('#membersTable'); // Inisialisasi DataTables setelah modal terbuka
+            }
         });
     }
 </script>
