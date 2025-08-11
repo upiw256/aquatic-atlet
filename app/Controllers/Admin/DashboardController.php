@@ -86,14 +86,38 @@ class DashboardController extends BaseController
     public function teams()
     {
         $teamModel = new TeamModel();
-        $teams = $teamModel->getTeamsWithOwner();
-        $members = new TeamMemberModel();
-        $anggota = [];
-        foreach ($teams as $team) {
-            $anggota[$team['id']] = $members->getMembersByTeam($team['id']);
+        $teamsRaw = $teamModel->getAllMembers(); // sudah pakai string_agg (PostgreSQL) atau group_concat (MySQL)
+
+        $groupedTeams = [];
+
+        foreach ($teamsRaw as $team) {
+            $members = [];
+            if (!empty($team['member_list'])) {
+                $memberItems = explode('|', $team['member_list']);
+                foreach ($memberItems as $item) {
+                    list($mid, $mname, $memail, $mrole) = explode(':', $item);
+                    $members[] = [
+                        'id'    => $mid,
+                        'name'  => $mname,
+                        'email' => $memail,
+                        'role'  =>  $mrole,// default role
+                    ];
+                }
+            }
+
+            $groupedTeams[] = [
+                'id'           => $team['id'],
+                'name'         => $team['name'],
+                'owner_name'   => $team['owner_name'],
+                'owner_email'  => $team['owner_email'],
+                'member_count' => count($members),
+                'members'      => $members
+            ];
         }
 
-        return view('admin/teams', ['teams' => $teams, 'anggota' => $anggota]);
+        return view('admin/teams', [
+            'teams' => $groupedTeams
+        ]);
     }
     public function users()
     {

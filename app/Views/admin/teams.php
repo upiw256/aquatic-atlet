@@ -16,12 +16,11 @@
             </tr>
         </thead>
         <tbody>
-            <?php $i = 0;
-            foreach ($teams as $team): ?>
+            <?php $i = 0; foreach ($teams as $team): ?>
                 <tr>
-                    <td><?= $i = $i + 1  ?></td>
+                    <td><?= ++$i ?></td>
                     <td><?= esc($team['name']) ?></td>
-                    <td><?= esc($team['owner_name'] === null ? '-' : $team['owner_name']) ?></td>
+                    <td><?= esc($team['owner_name'] ?? '-') ?></td>
                     <td><?= esc($team['member_count']) ?></td>
                     <td>
                         <button
@@ -39,11 +38,11 @@
 </div>
 
 <script>
-    const membersData = <?= json_encode($team) ?>;
-    // console.log(membersData);
+    const membersData = <?= json_encode($teams) ?>;
+
     function showMembers(teamId) {
-        const data = membersData.id;
-        console.log(data);
+        const data = membersData.find(team => team.id == teamId);
+
         if (!data || !data.members || data.members.length === 0) {
             Swal.fire({
                 icon: 'info',
@@ -82,8 +81,9 @@
             </div>`;
 
         Swal.fire({
-            title: `Anggota Tim ${data.team_name}`,
-            html: tableHTML,
+            title: `Anggota Tim ${data.name}`,
+            html: `<div style="max-height:400px; overflow-y:auto;">${tableHTML}</div>`,
+            width: '800px',
             showCloseButton: true,
             focusConfirm: false,
             confirmButtonText: 'Tutup',
