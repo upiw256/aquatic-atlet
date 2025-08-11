@@ -30,7 +30,11 @@
                             Lihat
                         </button>
                         <a href="/admin/teams/edit/<?= $team['id'] ?>" class="btn btn-sm btn-warning">Edit</a>
-                        <a href="/admin/teams/<?= $team['id'] ?>" class="btn btn-sm btn-danger" onclick="return confirm('Hapus tim ini?')">Hapus</a>
+                        <button
+                            onclick="deleteTeam('<?= $team['id'] ?>')"
+                            class="btn btn-sm btn-danger">
+                            Hapus
+                        </button>
                     </td>
                 </tr>
             <?php endforeach ?>
@@ -52,7 +56,7 @@
             ? `<img src="uploads/logo/${team.logo}" alt="Logo Tim" style="max-width: 120px;">`
             : 'Tidak ada logo'}
             </div>
-            <div class="col-md-10">
+            <div class="col-md-8">
                 <p>${team.description || 'Tidak ada deskripsi'}</p>
             </div>
         </div>
@@ -76,7 +80,7 @@
                 `).join('')}
             </tbody>
         </table>
-    `;
+        `;
 
         Swal.fire({
             title: `Anggota Tim ${team.name}`,
@@ -85,6 +89,54 @@
             heightAuto: false,
             didOpen: () => {
                 new DataTable('#membersTable'); // Inisialisasi DataTables setelah modal terbuka
+            }
+        });
+    }
+
+    function deleteTeam(teamId) {
+        Swal.fire({
+            title: "Yakin ingin menghapus tim ini?",
+            text: "Data yang sudah dihapus tidak bisa dikembalikan!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Ya, hapus!"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`admin/teams/delete/${teamId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Berhasil',
+                                text: data.message,
+                                timer: 1500,
+                                showConfirmButton: false
+                            }).then(() => {
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Gagal',
+                                text: data.message
+                            });
+                        }
+                    })
+                    .catch(() => {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Kesalahan',
+                            text: 'Terjadi kesalahan pada server.'
+                        });
+                    });
             }
         });
     }

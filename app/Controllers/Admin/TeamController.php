@@ -59,7 +59,7 @@ class TeamController extends BaseController
         // Jika tim sudah punya owner, jadikan role-nya member
         if (!empty($team['owner_id'])) {
             $userModel->update($team['owner_id'], ['role' => 'member']);
-        }        
+        }
 
         // Update tim dengan owner baru (user id dari URL)
         $teamModel->update($teamId, ['owner_id' => $userId]);
@@ -213,17 +213,47 @@ class TeamController extends BaseController
     }
 
     public function delete($id)
-    {
-        $teamModel = new TeamModel();
-        $team = $teamModel->find($id);
-        if (!$team) {
-            return redirect()->to('/admin/teams')->with('error', 'Tim tidak ditemukan.');
-        }
+{
+    $teamModel = new TeamModel();
+    $memberModel = new TeamMemberModel();
+    $userModel = new UserModel();
 
-        $teamModel->delete($id);
-
-        return redirect()->to('/admin/teams')->with('success', 'Tim berhasil dihapus!');
+    // Ambil data tim (owner_id ada di sini)
+    $team = $teamModel->find($id);
+    if (!$team) {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Tim tidak ditemukan.'
+        ])->setStatusCode(404);
     }
+
+    $ownerId = $team['owner_id'];
+
+    // Hitung jumlah anggota selain owner
+    $jumlahAnggota = $memberModel
+        ->where('team_id', $id)
+        ->where('id !=', $ownerId)
+        ->countAllResults();
+
+    if ($jumlahAnggota > 0) {
+        return $this->response->setJSON([
+            'status' => 'error',
+            'message' => 'Tidak bisa menghapus tim ini karena masih ada anggota selain owner.'
+        ])->setStatusCode(400);
+    }
+
+    // Ubah role owner jadi member
+    $userModel->update($ownerId, ['role' => 'member']);
+
+    // Hapus tim
+    $teamModel->delete($id);
+
+    return $this->response->setJSON([
+        'status' => 'success',
+        'message' => 'Tim berhasil dihapus dan role owner diubah menjadi member.'
+    ]);
+}
+
 
     public function deleteLogo($id)
     {
@@ -262,7 +292,7 @@ class TeamController extends BaseController
             'users' => $users
         ]);
     }
-    public function detail($id) 
+    public function detail($id)
     {
         $teamModel = new TeamModel();
         $team = $teamModel->find($id);
@@ -278,6 +308,5 @@ class TeamController extends BaseController
             'team' => $team,
             'members' => $members
         ]);
-        
     }
 }
