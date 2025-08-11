@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <base href="<?= base_url() ?>/">
-    <title><?= $title ?? 'Member Area' ?></title>
+    <title><?= $title ?? 'Admin Area' ?></title>
     <!-- Styles -->
     <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" /> -->
     <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" /> -->
@@ -202,6 +202,13 @@
                 icon: 'error',
                 title: 'Oops...',
                 text: '<?= session()->getFlashdata('error') ?>'
+            });
+        <?php endif; ?>
+        <?php if (session()->getFlashdata('error')): ?>
+            Swal.fire({
+                icon: 'warning',
+                title: 'Oops...',
+                text: '<?= session()->getFlashdata('warning') ?>'
             });
         <?php endif; ?>
     </script>

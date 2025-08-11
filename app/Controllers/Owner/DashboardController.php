@@ -8,6 +8,7 @@ use App\Models\TeamModel;
 use App\Models\UserModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use Ramsey\Uuid\Uuid;
+use App\Models\BiodataModel;
 
 class DashboardController extends BaseController
 {
@@ -18,6 +19,12 @@ class DashboardController extends BaseController
         $teamModel = new TeamModel();
         $teamMemberModel = new TeamMemberModel();
         $userModel = new UserModel();
+        $biodataModel = new BiodataModel();
+        // cek apakah sudah isi biodata jika belum redirect ke biodata
+        $biodata = $biodataModel->where('user_id', $userId)->first();
+        if (!$biodata) {
+            return redirect()->to('/owner/profile')->with('warning', 'Anda harus mengisi biodata terlebih dahulu sebelum mengakses dashboard.');
+        }
 
         $team = $teamModel->getTeamByOwnerId($userId);
 
@@ -98,8 +105,8 @@ class DashboardController extends BaseController
     {
         $teamModel = new TeamModel();
         $team = $teamModel->find($id);
-
-        if (!$team || $team['owner_id'] !== session('id')) {
+        //dd(session('id'));
+        if (!$team || $team['owner_id'] !== session('user_id')) {
             return redirect()->to('/owner/dashboard')->with('error', 'Tim tidak ditemukan atau bukan milik Anda.');
         }
 

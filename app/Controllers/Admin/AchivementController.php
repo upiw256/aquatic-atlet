@@ -43,8 +43,6 @@ class AchivementController extends BaseController
         }
 
         $data = [
-            'title' => 'Achievements',
-            'active' => 'achievements',
             'achievements' => $grouped,
         ];
 

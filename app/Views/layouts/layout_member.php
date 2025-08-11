@@ -149,6 +149,13 @@
                 text: '<?= session()->getFlashdata('error') ?>'
             });
         <?php endif; ?>
+        <?php if (session()->getFlashdata('warning')): ?>
+            Swal.fire({
+                icon: 'warning',
+                title: 'Oops...',
+                text: '<?= session()->getFlashdata('warning') ?>'
+            });
+        <?php endif; ?>
 
         function previewPhoto(event) {
             const input = event.target;
