@@ -28,11 +28,6 @@ class DashboardController extends BaseController
         // Ambil query builder
         $builder = $userModel->getMembersWithTeam();
 
-        $page = $this->request->getVar('page') ?? 1;
-
-        // Hitung total data
-        $total = $builder->countAllResults(false); // false: agar builder tidak di-reset
-
         // Ambil data paginated
         $members = $builder
             ->get()
@@ -124,9 +119,11 @@ class DashboardController extends BaseController
     public function users()
     {
         $userModel = new UserModel();
+
         $data = [
-            'users' => $userModel->findAll()               // kirim pager ke view
+            'users' => $userModel->getEligibleAdmins()
         ];
+    
         return view('admin/users', $data);
     }
 
