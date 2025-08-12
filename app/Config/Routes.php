@@ -33,6 +33,10 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->post('teams/store', 'Admin\TeamController::store');
     $routes->get('assign-owner/(:segment)', 'Admin\TeamController::assignOwnerForm/$1');
     $routes->post('assign-owner/(:segment)', 'Admin\TeamController::assignOwner/$1');
+    $routes->get('teams/edit/(:segment)', 'Admin\TeamController::edit/$1');
+    $routes->post('teams/update/(:segment)', 'Admin\TeamController::update/$1');
+    $routes->delete('teams/delete/(:segment)', 'Admin\TeamController::delete/$1');
+    $routes->get('teams/detail/(:segment)', 'Admin\TeamController::detail/$1');
 
     // Achievements
     $routes->get('achivements', 'Admin\AchivementController::index');
