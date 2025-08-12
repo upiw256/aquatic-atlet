@@ -50,33 +50,61 @@ class DashboardController extends BaseController
         ]);
     }
 
-    public function makeAdmin($id)
+    public function makeAdmin()
     {
-        $userModel = new UserModel();
-        $getTeamByMember = new TeamMemberModel();
-        $user = $userModel->find($id);
+        if (!$this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Request tidak valid',
+            ])->setStatusCode(400);
+        }
 
+        // Ambil data dari body JSON
+        $data = $this->request->getJSON(true);
+        $id   = $data['user_id'] ?? null;
+        $role = $data['role'] ?? null;
+
+        if (!$id) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'User ID wajib dikirim',
+            ])->setStatusCode(400);
+        }
+
+        $userModel = new UserModel();
+        $teamMemberModel = new TeamMemberModel();
+
+        // Ambil data user
+        $user = $userModel->find($id);
         if (!$user) {
             return $this->response->setJSON([
                 'status' => 'error',
                 'message' => 'User tidak ditemukan',
             ])->setStatusCode(404);
         }
-        // cek jika user sudah admin
-        if ($getTeamByMember->getTeamByMember($id)) {
+
+        // Cek apakah user adalah atlet
+        if ($teamMemberModel->getTeamByMember($id)) {
             return $this->response->setJSON([
                 'status' => 'error',
-                'message' => 'User adalah atlit, tidak bisa dijadikan admin',
+                'message' => 'User adalah atlet, tidak bisa dijadikan admin',
             ])->setStatusCode(400);
         }
+
+        // Toggle role
         if ($user['role'] === 'admin') {
             $userModel->update($id, ['role' => 'member']);
             return $this->response->setJSON([
                 'status' => 'success',
                 'message' => $user['name'] . ' berhasil dijadikan member',
             ]);
+        } else if ($role === 'inspector') {
+            $userModel->update($id, ['role' => 'inspector']);
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => $user['name'] . ' berhasil dijadikan pengawas',
+            ]);
         } else {
-
             $userModel->update($id, ['role' => 'admin']);
             return $this->response->setJSON([
                 'status' => 'success',
@@ -103,7 +131,7 @@ class DashboardController extends BaseController
                         'id'    => $mid,
                         'name'  => $mname,
                         'email' => $memail,
-                        'role'  =>  $mrole,// default role
+                        'role'  =>  $mrole, // default role
                     ];
                 }
             }
@@ -131,7 +159,7 @@ class DashboardController extends BaseController
         $data = [
             'users' => $userModel->getEligibleAdmins()
         ];
-    
+
         return view('admin/users', $data);
     }
 

@@ -25,7 +25,6 @@ class LoginController extends BaseController
             return redirect()->back()->withInput()->with('error', 'Email atau password salah!');
         }
         if (! $isVerified && $user['email_verified_at'] === null) {
-            // session()->destroy();
             return redirect()->back()->withInput()->with('error', 'Akun Anda belum aktif. Silakan cek email untuk verifikasi.');
         }
 
@@ -42,6 +41,8 @@ class LoginController extends BaseController
             return redirect()->to('/admin/dashboard')->with('success', 'Selamat datang, Admin!');
         } elseif ($user['role'] === 'owner') {
             return redirect()->to('/owner/dashboard')->with('success', 'Selamat datang, Owner!');
+        } elseif ($user['role'] === 'inspector') {
+            return redirect()->to('/inspector/dashboard')->with('success', 'Selamat datang, inspector!');
         } else {
             return redirect()->to('/member/dashboard')->with('success', 'Selamat datang, Member!');
         }

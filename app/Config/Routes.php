@@ -19,9 +19,9 @@ $routes->post('/resend-email', 'RegisterController::resendVerification');
 
 
 // Dashboard umum
-$routes->get('/dashboard', 'DashboardController::index', ['filter' => 'role:admin,owner,member']);
-$routes->get('/member/profile', 'Member\ProfileController::index', ['filter' => 'role:admin,owner,member']);
-$routes->post('/member/profile/save', 'Member\ProfileController::save', ['filter' => 'role:admin,owner,member']);
+$routes->get('/dashboard', 'DashboardController::index', ['filter' => 'role:admin,owner,member,inspector']);
+$routes->get('/member/profile', 'Member\ProfileController::index', ['filter' => 'role:admin,owner,member,inspector']);
+$routes->post('/member/profile/save', 'Member\ProfileController::save', ['filter' => 'role:admin,owner,member,inspector']);
 // Admin Group
 $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->get('/', 'Admin\DashboardController::index');
@@ -29,8 +29,8 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->get('users/search', 'Admin\DashboardController::search');
     $routes->get('users', 'Admin\DashboardController::users');
     $routes->put('users/reset/(:segment)', 'Admin\DashboardController::usersReset/$1');
-    $routes->put('makeadmin/(:segment)', 'Admin\DashboardController::makeAdmin/$1');
-    $routes->get('members', 'Admin\DashboardController::members');
+    $routes->put('users/updateRole/', 'Admin\DashboardController::makeAdmin');
+    $routes->get('members', 'Admin\DashboardController::members', ['filter' => 'role:inspector']);
     $routes->get('teams', 'Admin\DashboardController::teams');
 
     // Teams
@@ -53,6 +53,12 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     // Biodata
     $routes->get('biodata/edit/(:uuid)', 'Admin\BiodataController::edit/$1');
     $routes->post('biodata/save/(:uuid)', 'Admin\BiodataController::save/$1');
+});
+
+// Inspector Group
+$routes->group('inspector', ['filter' => 'role:inspector'], function ($routes) {
+    $routes->get('dashboard', 'Inspector\DashboardController::index');
+    $routes->get('admin/members', 'Admin\DashboardController::members');
 });
 
 // Owner Group

@@ -27,6 +27,8 @@
                             <span class="badge bg-primary">Owner</span>
                         <?php elseif ($user['member_id'] != null): ?>
                             <span class="badge bg-success">Atlet</span>
+                        <?php elseif ($user['role'] === 'inspector'): ?>
+                            <span class="badge bg-warning">Inspector</span>
                         <?php elseif ($user['role'] === 'member'): ?>
                             <span class="badge bg-warning">Memeber</span>
                         <?php else: ?>
@@ -42,9 +44,10 @@
                                 empty($user['member_id']) && // belum gabung tim
                                 empty($user['is_owner'])     // bukan owner
                             ): ?>
-                                <button onclick="confirmJadikanAdmin('<?= $user['id'] ?>','<?= $user['name'] ?>')" class="btn btn-sm btn-info">Jadikan Admin</button>
+                                <button class="btn btn-sm btn-info" onclick="confirmJadikanAdmin('<?= $user['id'] ?>','<?= $user['name'] ?>','admin')">Jadikan Admin</button>
+                                <button class="btn btn-sm btn-success" onclick="confirmJadikanAdmin('<?= $user['id'] ?>','<?= $user['name'] ?>','inspector')">Jadikan Pengawas</button>
 
-                            <?php elseif ($user['role'] === 'admin'): ?>
+                            <?php elseif ($user['role'] === 'admin' || $user['role'] === 'inspector'): ?>
                                 <button onclick="confirmJadikanAdmin('<?= $user['id'] ?>','<?= $user['name'] ?>')" class="btn btn-sm btn-primary">Jadikan Member</button>
 
                             <?php elseif ($user['role'] === 'owner'): ?>
@@ -60,72 +63,48 @@
 </div>
 
 <script>
-    const tbody = document.querySelector('#userTable tbody');
-    const pager = document.querySelector('.d-flex.justify-content-center');
-    const originalTbody = tbody.innerHTML;
-    const searchInput = document.getElementById('searchInput');
-    const searchButton = document.getElementById('searchButton');
-
-    searchButton.addEventListener('click', () => {
-        const query = searchInput.value.trim();
-        searchUsers(query);
-    });
-
-    searchInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') {
-            searchUsers(searchInput.value.trim());
-        }
-    });
-
-    async function searchUsers(query) {
-        if (query.length < 3) {
-            tbody.innerHTML = originalTbody;
-            pager.style.display = 'flex';
-            return;
-        }
-
-        try {
-            const res = await fetch(`/admin/users/search?q=${encodeURIComponent(query)}`);
-            const users = await res.json();
-
-            pager.style.display = 'none';
-            tbody.innerHTML = '';
-
-            if (users.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" class="text-center">Tidak ada hasil ditemukan</td></tr>`;
-                return;
+    function confirmJadikanAdmin(userId, userName, role) {
+        Swal.fire({
+            title: 'Yakin akan merubah role?',
+            text: ` ${userName} akan Merubah role.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Ya, Setuju!',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/admin/users/updateRole/`, {
+                        method: 'put',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-TOKEN': '<?= csrf_hash() ?>'
+                        },
+                        body: JSON.stringify({
+                            role: role,
+                            user_id: userId
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            Swal.fire({
+                                title: 'Berhasil!',
+                                html: data.message,
+                                icon: 'success'
+                            }).then(() => {
+                                location.reload(); // reload seluruh halaman
+                            });
+                        } else {
+                            Swal.fire('Error', data.message, 'error');
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        Swal.fire('Error', `Terjadi kesalahan saat menghubungi server. ${err}`, 'error');
+                    });
             }
-
-            users.forEach((user, index) => {
-                const badgeClass = user.role === 'admin' ? 'danger' :
-                    user.role === 'owner' ? 'primary' :
-                    user.role === 'member' ? 'success' : 'secondary';
-
-                let aksi = '';
-                if ('<?= session()->get('user_id') ?>' !== user.id) {
-                    aksi += `<button onclick="resetPassword('${user.id}')" class="btn btn-sm btn-warning">Reset Password</button> `;
-                    if (user.role === 'member') {
-                        aksi += `<button onclick="confirmJadikanAdmin('${user.id}','${user.name}')" class="btn btn-sm btn-info">Jadikan Admin</button>`;
-                    } else if (user.role === 'admin') {
-                        aksi += `<button onclick="confirmJadikanAdmin('${user.id}','${user.name}')" class="btn btn-sm btn-primary">Jadikan Member</button>`;
-                    }
-                }
-
-                tbody.innerHTML += `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>${user.name}</td>
-                    <td>${user.email}</td>
-                    <td><span class="badge bg-${badgeClass}">${user.role}</span></td>
-                    <td>${aksi}</td>
-                </tr>
-            `;
-            });
-
-        } catch (err) {
-            console.error('Gagal fetch data:', err);
-            tbody.innerHTML = `<tr><td colspan="5" class="text-danger text-center">Gagal mengambil data</td></tr>`;
-        }
+        });
     }
 </script>
 

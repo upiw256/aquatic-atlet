@@ -28,7 +28,7 @@ class ProfileController extends BaseController
     {
         try {
             $this->validate([
-                'nik'            => 'permit_empty|max_length[20]',
+                'nik'            => 'permit_empty|max_length[20]|is_unique[biodata.nik]',
                 'fullname'       => 'required|max_length[255]',
                 'gender'         => 'permit_empty|in_list[laki-laki,perempuan]',
                 'birth_place'    => 'permit_empty|max_length[100]',
