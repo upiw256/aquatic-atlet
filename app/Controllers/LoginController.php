@@ -19,9 +19,14 @@ class LoginController extends BaseController
 
         $userModel = new \App\Models\UserModel();
         $user = $userModel->where('email', $email)->first();
+        $isVerified = ($user['is_verified'] === true || $user['is_verified'] === 1 || $user['is_verified'] === 't');
 
         if (! $user || ! password_verify($password, $user['password'])) {
             return redirect()->back()->withInput()->with('error', 'Email atau password salah!');
+        }
+        if (! $isVerified && $user['email_verified_at'] === null) {
+            // session()->destroy();
+            return redirect()->back()->withInput()->with('error', 'Akun Anda belum aktif. Silakan cek email untuk verifikasi.');
         }
 
         session()->set([

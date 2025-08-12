@@ -9,9 +9,14 @@ $routes->get('/', 'Home::index');
 $routes->get('/team-detail/(:segment)', 'Home::teamDetail/$1');
 $routes->get('/register', 'RegisterController::index');
 $routes->post('/register', 'RegisterController::store');
+$routes->get('/verify-email/(:segment)', 'RegisterController::verify/$1');
 $routes->get('/login', 'LoginController::index');
 $routes->post('/login', 'LoginController::authenticate');
 $routes->get('/logout', 'LoginController::logout');
+// Resend verification email
+$routes->get('/resend-email', 'RegisterController::resendVerificationForm');
+$routes->post('/resend-email', 'RegisterController::resendVerification');
+
 
 // Dashboard umum
 $routes->get('/dashboard', 'DashboardController::index', ['filter' => 'role:admin,owner,member']);
