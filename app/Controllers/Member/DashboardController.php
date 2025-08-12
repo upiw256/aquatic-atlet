@@ -19,7 +19,10 @@ class DashboardController extends BaseController
         $userModel = new UserModel();
         $teamModel = new TeamModel();
         $teamMemberModel = new TeamMemberModel();
-
+        // Cek apakah sudah isi biodata
+        if (!$biodata) {
+            return redirect()->to('/member/profile')->with('warning', 'Anda harus mengisi biodata terlebih dahulu sebelum mengakses dashboard.');
+        }
         // Data user
         $user = $userModel->find($userId);
 

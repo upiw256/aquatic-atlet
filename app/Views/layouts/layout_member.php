@@ -34,7 +34,7 @@
                             <span class="hide-menu">Home</span>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="/member/dashboard" aria-expanded="false">
+                            <a class="sidebar-link" href="/<?= session('role') ?>/dashboard" aria-expanded="false">
                                 <i class="ti ti-atom"></i>
                                 <span class="hide-menu">Dashboard</span>
                             </a>
@@ -147,6 +147,13 @@
                 icon: 'error',
                 title: 'Gagal',
                 text: '<?= session()->getFlashdata('error') ?>'
+            });
+        <?php endif; ?>
+        <?php if (session()->getFlashdata('warning')): ?>
+            Swal.fire({
+                icon: 'warning',
+                title: 'Oops...',
+                text: '<?= session()->getFlashdata('warning') ?>'
             });
         <?php endif; ?>
 

@@ -5,25 +5,14 @@ namespace App\Database\Seeds;
 use CodeIgniter\Database\Seeder;
 use Ramsey\Uuid\Uuid;
 use Faker\Factory;
-
-class AdminSeeder extends Seeder
+class UserSeeder extends Seeder
 {
     public function run()
     {
         $faker = Factory::create('id_ID');
-        $uuid = Uuid::uuid4()->toString();
 
-        // $data = [
-        //     'id'       => $uuid,
-        //     'name'     => 'Super Admin',
-        //     'email'    => 'bilqimlb@gmail.com',
-        //     'password' => password_hash('5414450', PASSWORD_DEFAULT),
-        //     'role'     => 'admin',
-        // ];
-
-        // $this->db->table('users')->insert($data);
-
-                for ($i = 0; $i < 50; $i++) {
+        // User random (50 data)
+        for ($i = 0; $i < 50; $i++) {
             $roles = ['member', 'admin', 'owner'];
             $data = [
                 'id'       => Uuid::uuid4()->toString(),
@@ -35,5 +24,6 @@ class AdminSeeder extends Seeder
 
             $this->db->table('users')->insert($data);
         }
+    
     }
 }

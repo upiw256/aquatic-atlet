@@ -33,9 +33,16 @@
                             <?= csrf_field() ?>
                             <input type="hidden" name="member_id" value="<?= esc($member['team_member_id']) ?>">
                             <select name="role" class="form-select form-select-sm me-2">
-                                <option value="atlet" <?= $member['role'] === 'atlet' ? 'selected' : '' ?>>Atlet</option>
+                                <option value="point" <?= $member['role'] === 'point' ? 'selected' : '' ?>>Point</option>
+                                <option value="Left Flat" <?= $member['role'] === 'Left Flat' ? 'selected' : '' ?>>Left Flat</option>
+                                <option value="Right Flat" <?= $member['role'] === 'Right Flat' ? 'selected' : '' ?>>Right Flat</option>
+                                <option value="Left Wing" <?= $member['role'] === 'Left Wing' ? 'selected' : '' ?>>Left Wing</option>
+                                <option value="Right Wing" <?= $member['role'] === 'Right Wing' ? 'selected' : '' ?>>Right Wing</option>
+                                <option value="Center Forward" <?= $member['role'] === 'Center Forward' ? 'selected' : '' ?>>Center Forward</option>
+                                <option value="Goalkeeper" <?= $member['role'] === 'Goalkeeper' ? 'selected' : '' ?>>Goalkeeper</option>
                                 <option value="cadangan" <?= $member['role'] === 'cadangan' ? 'selected' : '' ?>>Cadangan</option>
                                 <option value="pelatih" <?= $member['role'] === 'pelatih' ? 'selected' : '' ?>>Pelatih</option>
+                                <option value="manager" <?= $member['role'] === 'manager' ? 'selected' : '' ?>>Manager</option>
                             </select>
                             <button class="btn btn-sm btn-primary" type="submit">Ubah</button>
                         </form>
@@ -61,7 +68,7 @@
     <form method="post" action="/owner/team/add">
         <?= csrf_field() ?>
         <div class="input-group mb-3">
-            <select name="user_id" class="form-select" required>
+            <select name="user_id" class="form-select" id="memberSelect" required>
                 <option value="">-- Pilih Member --</option>
                 <?php foreach ($availableMembers as $am): ?>
                     <option value="<?= esc($am['id']) ?>"><?= esc($am['name']) ?> (<?= esc($am['email']) ?>)</option>
@@ -73,5 +80,14 @@
 <?php else: ?>
     <div class="alert alert-warning">Anda belum memiliki tim. Silakan hubungi admin.</div>
 <?php endif; ?>
+
+<script>
+        $( '#memberSelect' ).select2( {
+            theme: 'bootstrap-5',
+            placeholder: 'Pilih Owner',
+            allowClear: true,
+            width: '100%',
+        } );
+    </script>
 
 <?= $this->endSection() ?>

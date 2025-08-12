@@ -5,10 +5,28 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <base href="<?= base_url() ?>/">
-    <title><?= $title ?? 'Member Area' ?></title>
+    <title><?= $title ?? 'Admin Area' ?></title>
+    <!-- Styles -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" /> -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" /> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+    <!-- Or for RTL support -->
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.rtl.min.css" /> -->
+
+    <!-- Scripts -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.slim.min.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> -->
     <link rel="shortcut icon" type="image/png" href="../assets/images/logo-aquatic.png" />
     <link rel="stylesheet" href="../assets/css/styles.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js "></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/css/bootstrap.min.css"></link>
+    <link href="https://cdn.datatables.net/2.3.2/css/dataTables.bootstrap5.css"></link>
+    <link href="https://cdn.datatables.net/responsive/3.0.5/css/responsive.dataTables.css"></link>
 </head>
 
 <body>
@@ -34,7 +52,7 @@
                         </li>
                         <li class="sidebar-item">
                             <a class="sidebar-link" href="/admin" aria-expanded="false">
-                                <i class="ti ti-atom"></i>
+                                <i class="ti ti-dashboard"></i>
                                 <span class="hide-menu">Dashboard</span>
                             </a>
                         </li>
@@ -46,8 +64,39 @@
                         </li>
                         <li class="sidebar-item">
                             <a class="sidebar-link" href="/admin/teams" aria-expanded="false">
-                                <i class="ti ti-users"></i>
+                                <i class="ti ti-atom"></i>
                                 <span class="hide-menu">Team</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="/admin/users" aria-expanded="false">
+                                <i class="ti ti-users"></i>
+                                <span class="hide-menu">User Management</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="/admin/achivements" aria-expanded="false">
+                                <i class="ti ti-trophy"></i>
+                                <span class="hide-menu">Penghargaan</span>
+                            </a>
+                        </li>
+                        
+                    </ul>
+                    <ul class="sidebar-nav mt-4">
+                        <li class="nav-small-cap">
+                            <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
+                            <span class="hide-menu">Settings</span>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="/member/profile" aria-expanded="false">
+                                <i class="ti ti-ad-2"></i>
+                                <span class="hide-menu">Biodata</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link" href="/logout" aria-expanded="false">
+                                <i class="ti ti-logout"></i>
+                                <span class="hide-menu">Logout</span>
                             </a>
                         </li>
                     </ul>
@@ -95,6 +144,23 @@
             </div>
         </div>
     </div>
+
+    <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
+    <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../assets/js/sidebarmenu.js"></script>
+    <script src="../assets/js/app.min.js"></script>
+    <!-- <script src="../assets/libs/apexcharts/dist/apexcharts.min.js"></script> -->
+    <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
+    <!-- <script src="../assets/js/dashboard.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.bootstrap5.js"></script>
+    <script src="https://cdn.datatables.net/responsive/3.0.5/js/responsive.dataTables.js"></script>
+    <script src="https://cdn.datatables.net/responsive/3.0.5/js/dataTables.responsive.js"></script>
+    <!-- solar icons -->
+    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
+    <!-- <script src=" https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js "></script> -->
     <script>
         function assignOwner(teamId) {
             Swal.fire({
@@ -138,16 +204,104 @@
                 text: '<?= session()->getFlashdata('error') ?>'
             });
         <?php endif; ?>
+        <?php if (session()->getFlashdata('error')): ?>
+            Swal.fire({
+                icon: 'warning',
+                title: 'Oops...',
+                text: '<?= session()->getFlashdata('warning') ?>'
+            });
+        <?php endif; ?>
     </script>
-    <script src="../assets/libs/jquery/dist/jquery.min.js"></script>
-    <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="../assets/js/sidebarmenu.js"></script>
-    <script src="../assets/js/app.min.js"></script>
-    <script src="../assets/libs/apexcharts/dist/apexcharts.min.js"></script>
-    <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
-    <script src="../assets/js/dashboard.js"></script>
-    <!-- solar icons -->
-    <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+    <script>
+        function confirmJadikanAdmin(userId, userName) {
+            Swal.fire({
+                title: 'Yakin akan merubah role?',
+                text: ` ${userName} akan Merubah role.`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Setuju!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/admin/makeadmin/${userId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '<?= csrf_hash() ?>'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                Swal.fire({
+                                    title: 'Berhasil!',
+                                    html: data.message,
+                                    icon: 'success'
+                                }).then(() => {
+                                    location.reload(); // reload seluruh halaman
+                                });
+                            } else {
+                                Swal.fire('Error', data.message, 'error');
+                            }
+                        })
+                        .catch(err => {
+                            Swal.fire('Error', `Terjadi kesalahan saat menghubungi server. ${err}`, 'error');
+                        });
+                }
+            });
+        }
+    </script>
+    <script>
+        function resetPassword(userId) {
+            Swal.fire({
+                title: 'Reset Password?',
+                text: "Password akan diganti secara acak.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Reset!',
+                cancelButtonText: 'Batal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/admin/users/reset/${userId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '<?= csrf_hash() ?>'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                Swal.fire({
+                                    title: 'Berhasil!',
+                                    html: `Password baru: <strong>${data.new_password}</strong>`,
+                                    icon: 'success'
+                                });
+                            } else {
+                                Swal.fire('Error', data.message, 'error');
+                            }
+                        })
+                        .catch(err => {
+                            Swal.fire('Error', 'Terjadi kesalahan saat menghubungi server.', 'error');
+                        });
+                }
+            });
+        }
+        new DataTable('#team',{
+            responsive: {
+                details: {
+                    display: $.fn.dataTable.Responsive.display.childRowImmediate
+                }
+            }
+        });    
+        new DataTable('#userTable', {
+            responsive: {
+                details: {
+                    display: $.fn.dataTable.Responsive.display.childRowImmediate
+                }
+            }
+        });    
+    </script>
 </body>
 
 </html>
