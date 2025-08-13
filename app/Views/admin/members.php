@@ -1,4 +1,4 @@
-<?= $this->extend('layouts/'.session()->get('role').'_layout') ?>
+<?= $this->extend('layouts/' . session()->get('role') . '_layout') ?>
 <?= $this->section('content') ?>
 <div class="container mt-4">
     <h1>Kelola Member</h1>
@@ -22,7 +22,11 @@
                     <td><?= esc($member['role']) ?> <?= esc($member['team']['name'] ?? $member['team_name']) ?></td>
                     <td>
                         <?php if (session()->get('role') === 'inspector'): ?>
-                            <a href="/inspector/members/print/<?= $member['id'] ?>" class="btn btn-sm btn-primary">Print</a>
+                            <?php if (session()->get('user_id') === $member['id'] || $member['role'] === 'owner' || $member['team'] === null): ?>
+                                <span class="text-muted">-</span>
+                            <?php else: ?>
+                                <a href="/inspector/portfolio/<?= $member['id'] ?>" class="btn btn-sm btn-primary">Print</a>
+                            <?php endif; ?>
                         <?php else: ?>
                             <?php if ($member['team'] === null && strtolower(trim($member['role'])) !== 'owner'): ?>
                                 <a href="/admin/assign-owner/<?= $member['id'] ?>" class="btn btn-sm btn-warning">Jadikan Owner</a>

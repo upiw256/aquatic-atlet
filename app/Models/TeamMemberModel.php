@@ -24,7 +24,7 @@ class TeamMemberModel extends Model
     public function getTeamByMember($userId)
     {
         return $this->db->table('team_members')
-            ->select('teams.*, users.name AS owner_name, users.email AS owner_email')
+            ->select('teams.*, users.name AS owner_name, users.email AS owner_email, team_members.role')
             ->join('teams', 'teams.id = team_members.team_id')
             ->join('users', 'users.id = teams.owner_id', 'left')
             ->where('team_members.member_id', $userId)

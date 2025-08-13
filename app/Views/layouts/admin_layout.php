@@ -57,7 +57,7 @@
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="/admin/members" aria-expanded="false">
+                            <a class="sidebar-link" href="/<?= session('role') ?>/members" aria-expanded="false">
                                 <i class="ti ti-user"></i>
                                 <span class="hide-menu">Members</span>
                             </a>

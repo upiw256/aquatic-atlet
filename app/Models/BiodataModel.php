@@ -48,4 +48,19 @@ class BiodataModel extends Model
     ];
     protected $validationMessages = [];
     protected $skipValidation     = false;
+    function getByUserId($id)
+    {
+        return $this->where('user_id', $id)->first();
+    }
+    function getDataFormUser($id)
+    {
+        return $this->select('
+            biodata.*,
+            users.name AS user_name,
+            users.email AS user_email
+        ')
+            ->join('users', 'users.id = biodata.user_id')
+            ->where('biodata.user_id', $id)
+            ->findAll();
+    }
 }

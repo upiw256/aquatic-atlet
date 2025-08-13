@@ -30,7 +30,7 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->get('users', 'Admin\DashboardController::users');
     $routes->put('users/reset/(:segment)', 'Admin\DashboardController::usersReset/$1');
     $routes->put('users/updateRole/', 'Admin\DashboardController::makeAdmin');
-    $routes->get('members', 'Admin\DashboardController::members', ['filter' => 'role:inspector']);
+    $routes->get('members', 'Admin\DashboardController::members');
     $routes->get('teams', 'Admin\DashboardController::teams');
 
     // Teams
@@ -58,7 +58,10 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
 // Inspector Group
 $routes->group('inspector', ['filter' => 'role:inspector'], function ($routes) {
     $routes->get('dashboard', 'Inspector\DashboardController::index');
-    $routes->get('admin/members', 'Admin\DashboardController::members');
+    $routes->get('members', 'Admin\DashboardController::members');
+    $routes->get('portfolio/(:segment)', 'Inspector\PortfolioController::pdf/$1');
+    $routes->get('portfolio/preview/(:segment)', 'Inspector\PortfolioController::preview/$1');
+
 });
 
 // Owner Group

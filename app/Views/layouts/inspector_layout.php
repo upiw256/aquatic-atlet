@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <base href="<?= base_url() ?>/">
-    <title><?= $title ?? 'Admin Area' ?></title>
+    <title><?= $title ?? 'Inspector Area' ?></title>
     <!-- Styles -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
     <!-- Or for RTL support -->
@@ -53,7 +53,7 @@
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="/inspector/admin/members" aria-expanded="false">
+                            <a class="sidebar-link" href="/<?= session('role') ?>/members" aria-expanded="false">
                                 <i class="ti ti-user"></i>
                                 <span class="hide-menu">Members</span>
                             </a>

@@ -9,6 +9,7 @@ use App\Models\UserModel;
 use App\Models\TeamModel;
 use App\Models\TeamMemberModel;
 
+
 class DashboardController extends BaseController
 {
     public function index()
@@ -33,6 +34,8 @@ class DashboardController extends BaseController
     {
         $userModel = new UserModel();
         $biodataTeamMemberModel = new TeamMemberModel();
+        $sessionRole = session()->get('role'); //inspector
+
         // Ambil query builder
         $builder = $userModel->getMembersWithTeam();
 
@@ -40,10 +43,16 @@ class DashboardController extends BaseController
         $members = $builder
             ->get()
             ->getResultArray();
-
-        // dd($biodataTeamMemberModel);
         foreach ($members as &$member) {
             $member['team'] = $biodataTeamMemberModel->getTeamByMember($member['id']);
+        }
+        // Filter khusus jika role inspector
+        if ($sessionRole === 'inspector') {
+            $members = array_filter($members, function ($m) {
+                return !empty($m['team']); // hanya yang punya team
+            });
+            // Reset index array
+            $members = array_values($members);
         }
         return view('admin/members', [
             'members' => $members,
