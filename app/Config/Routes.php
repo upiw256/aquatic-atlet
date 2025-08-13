@@ -61,6 +61,7 @@ $routes->group('inspector', ['filter' => 'role:inspector'], function ($routes) {
     $routes->get('members', 'Admin\DashboardController::members');
     $routes->get('portfolio/(:segment)', 'Inspector\PortfolioController::pdf/$1');
     $routes->get('portfolio/preview/(:segment)', 'Inspector\PortfolioController::preview/$1');
+    $routes->get('teams', 'Admin\DashboardController::teams');
 
 });
 

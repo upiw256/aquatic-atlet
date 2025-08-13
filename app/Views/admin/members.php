@@ -25,7 +25,7 @@
                             <?php if (session()->get('user_id') === $member['id'] || $member['role'] === 'owner' || $member['team'] === null): ?>
                                 <span class="text-muted">-</span>
                             <?php else: ?>
-                                <a href="/inspector/portfolio/<?= $member['id'] ?>" class="btn btn-sm btn-primary">Print</a>
+                                <a href="/inspector/portfolio/<?= $member['id'] ?>" class="btn btn-sm btn-primary"><i class="ti ti-printer"></i> Print</a>
                             <?php endif; ?>
                         <?php else: ?>
                             <?php if ($member['team'] === null && strtolower(trim($member['role'])) !== 'owner'): ?>
