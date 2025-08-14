@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\BiodataModel;
 use App\Models\UserModel;
 use Ramsey\Uuid\Uuid;
+use Config\Services;
 
 class ProfileController extends BaseController
 {
@@ -26,71 +27,70 @@ class ProfileController extends BaseController
 
     public function save()
     {
-            $userId = session('user_id');
+        $userId = session('user_id');
+        $biodataModel = new BiodataModel();
+        $userModel = new UserModel();
 
-            $biodataModel = new BiodataModel();
-            $userModel    = new UserModel();
+        $uploadedPhoto = $this->request->getFile('photo');
 
-            // Data tanpa file dulu
-            $data = [
-                'user_id'        => $userId,
-                'nik'            => $this->request->getPost('nik'),
-                'gender'         => $this->request->getPost('gender'),
-                'birth_place'    => $this->request->getPost('birth_place'),
-                'birth_date'     => $this->request->getPost('birth_date'),
-                'religion'       => $this->request->getPost('religion'),
-                'marital_status' => $this->request->getPost('marital_status'),
-                'education'      => $this->request->getPost('education'),
-                'occupation'     => $this->request->getPost('occupation'),
-                'address'        => $this->request->getPost('address'),
-                'phone'          => $this->request->getPost('phone'),
-            ];
+        $biodataData = [
+            'user_id'        => $userId,
+            'nik'            => $this->request->getPost('nik'),
+            'gender'         => $this->request->getPost('gender'),
+            'birth_place'    => $this->request->getPost('birth_place'),
+            'birth_date'     => $this->request->getPost('birth_date'),
+            'religion'       => $this->request->getPost('religion'),
+            'marital_status' => $this->request->getPost('marital_status'),
+            'education'      => $this->request->getPost('education'),
+            'occupation'     => $this->request->getPost('occupation'),
+            'address'        => $this->request->getPost('address'),
+            'phone'          => $this->request->getPost('phone')
+        ];
 
-            // Handle upload foto
-            $file = $this->request->getFile('photo');
-            // dd($file);
-            $fileName = 'Profil_'.$userId . '.' . $file->getExtension();
-
-            if ($file && $file->isValid() && !$file->hasMoved()) {
-                // Upload foto baru
-                $data['photo'] = 'uploads/photos/' . $fileName;
-                if (file_exists(FCPATH . 'uploads/photos/' . $fileName)) {
-                    // Hapus foto lama jika ada
-                    unlink(FCPATH . 'uploads/photos/' . $fileName);
-                }else{
-
-                    $file->move(FCPATH . 'uploads/photos', $fileName);
+        if ($uploadedPhoto && $uploadedPhoto->isValid() && !$uploadedPhoto->hasMoved()) {
+            $extension = $uploadedPhoto->getExtension() ?: $uploadedPhoto->guessExtension();
+            $photoFileName = 'Profil_' . $userId . '.' . $extension;
+            $targetPath = FCPATH . 'uploads/photos/' . $photoFileName;
+    
+            // Hapus foto lama jika ekstensi berbeda
+            $oldPhoto = $this->request->getPost('old_photo');
+            if ($oldPhoto && file_exists(FCPATH . $oldPhoto)) {
+                $oldExtension = pathinfo($oldPhoto, PATHINFO_EXTENSION);
+                if (strtolower($oldExtension) !== strtolower($extension)) {
+                    unlink(FCPATH . $oldPhoto);
                 }
-            } else {
-                // Tidak ada upload baru → pakai foto lama
-                $data['photo'] = $this->request->getPost('old_photo');
             }
-            $existing = $biodataModel->where('user_id', $userId)->first();
-            
-            if ($existing) {
-                if (!$biodataModel->update($existing['id'], $data)) {
-                    return redirect()->back()
-                    ->withInput()
-                    ->with('error', $biodataModel->errors());
-                }
-                
-                $hasil = "Biodata berhasil diperbarui.";
-            } else {
-                $data['id'] = Uuid::uuid4()->toString();
-                if (!$biodataModel->insert($data)) {
-                    return redirect()->back()
-                    ->withInput()
-                    ->with('error', $biodataModel->errors());
-                }
-                $hasil = "Biodata berhasil disimpan.";
-            }
+    
+            // PROSES RESIZE DULU SEBELUM MOVE
+            \Config\Services::image()
+                ->withFile($uploadedPhoto) // Gunakan objek file langsung
+                ->fit(300, 300, 'center')
+                ->save($targetPath);
+    
+            // Update path di database
+            $biodataData['photo'] = 'uploads/photos/' . $photoFileName;
+    
+            // Pindahkan file asli (jika ingin menyimpan versi original)
+            // $uploadedPhoto->move(FCPATH . 'uploads/photos/original/', $photoFileName); // Opsional
+    
+        } else {
+            $biodataData['photo'] = $this->request->getPost('old_photo');
+        }
 
-            // Update nama di tabel user
-            $userModel->update($userId, [
-                'name' => $this->request->getPost('fullname'),
-            ]);
+        // Simpan biodata
+        $existingBiodata = $biodataModel->where('user_id', $userId)->first();
+        if ($existingBiodata) {
+            $biodataModel->update($existingBiodata['id'], $biodataData);
+            $message = "Biodata berhasil diperbarui.";
+        } else {
+            $biodataData['id'] = Uuid::uuid4()->toString();
+            $biodataModel->insert($biodataData);
+            $message = "Biodata berhasil disimpan.";
+        }
 
-            return redirect()->back()
-                ->with('success', $hasil);
+        // Update nama user
+        $userModel->update($userId, ['name' => $this->request->getPost('fullname')]);
+
+        return redirect()->back()->with('success', $message);
     }
 }
