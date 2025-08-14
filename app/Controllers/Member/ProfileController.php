@@ -26,29 +26,15 @@ class ProfileController extends BaseController
 
     public function save()
     {
-        try {
-            $this->validate([
-                'nik'            => 'permit_empty|max_length[20]|is_unique[biodata.nik]',
-                'fullname'       => 'required|max_length[255]',
-                'gender'         => 'permit_empty|in_list[laki-laki,perempuan]',
-                'birth_place'    => 'permit_empty|max_length[100]',
-                'birth_date'     => 'permit_empty|valid_date',
-                'religion'       => 'permit_empty|max_length[20]',
-                'marital_status' => 'permit_empty|in_list[menikah,belum]',
-                'education'      => 'permit_empty|max_length[50]',
-                'occupation'     => 'permit_empty|max_length[100]',
-                'address'        => 'permit_empty',
-                'phone'          => 'permit_empty|max_length[20]',
-                'photo'          => 'permit_empty|max_length[255]',
-            ]);
-
             $userId = session('user_id');
+
             $biodataModel = new BiodataModel();
-            $userModel = new UserModel();
+            $userModel    = new UserModel();
+
+            // Data tanpa file dulu
             $data = [
                 'user_id'        => $userId,
                 'nik'            => $this->request->getPost('nik'),
-                'name'       => $this->request->getPost('fullname'),
                 'gender'         => $this->request->getPost('gender'),
                 'birth_place'    => $this->request->getPost('birth_place'),
                 'birth_date'     => $this->request->getPost('birth_date'),
@@ -62,26 +48,49 @@ class ProfileController extends BaseController
 
             // Handle upload foto
             $file = $this->request->getFile('photo');
+            // dd($file);
+            $fileName = 'Profil_'.$userId . '.' . $file->getExtension();
+
             if ($file && $file->isValid() && !$file->hasMoved()) {
-                $newName = $file->getRandomName();
-                $file->move('uploads/photos/', $newName);
-                $data['photo'] = 'uploads/photos/' . $newName;
+                // Upload foto baru
+                $data['photo'] = 'uploads/photos/' . $fileName;
+                if (file_exists(FCPATH . 'uploads/photos/' . $fileName)) {
+                    // Hapus foto lama jika ada
+                    unlink(FCPATH . 'uploads/photos/' . $fileName);
+                }else{
+
+                    $file->move(FCPATH . 'uploads/photos', $fileName);
+                }
+            } else {
+                // Tidak ada upload baru → pakai foto lama
+                $data['photo'] = $this->request->getPost('old_photo');
             }
-
             $existing = $biodataModel->where('user_id', $userId)->first();
-
+            
             if ($existing) {
-                $biodataModel->update($existing['id'], $data);
+                if (!$biodataModel->update($existing['id'], $data)) {
+                    return redirect()->back()
+                    ->withInput()
+                    ->with('error', $biodataModel->errors());
+                }
+                
+                $hasil = "Biodata berhasil diperbarui.";
             } else {
                 $data['id'] = Uuid::uuid4()->toString();
-                $biodataModel->insert($data);
+                if (!$biodataModel->insert($data)) {
+                    return redirect()->back()
+                    ->withInput()
+                    ->with('error', $biodataModel->errors());
+                }
+                $hasil = "Biodata berhasil disimpan.";
             }
+
+            // Update nama di tabel user
             $userModel->update($userId, [
                 'name' => $this->request->getPost('fullname'),
             ]);
-            return redirect()->back()->with('success', 'Biodata berhasil disimpan.');
-        } catch (\Exception $e) {
-            return redirect()->back()->withInput()->with('error', $e->getMessage());
-        }
+
+            return redirect()->back()
+                ->with('success', $hasil);
     }
 }
