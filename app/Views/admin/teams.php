@@ -25,7 +25,7 @@
                     <td><?= esc($team['member_count']) ?></td>
                     <td>
                         <?php if (session()->get('role') === 'inspector'): ?>
-                            <a href="/inspector/portfolio/<?= $team['id'] ?>" class="btn btn-sm btn-primary"><i class="ti ti-printer"></i> Print</a>
+                            <a href="/inspector/team/<?= $team['id'] ?>" class="btn btn-sm btn-primary"><i class="ti ti-printer"></i> Print</a>
                         <?php endif; ?>
                         <button
                             onclick="showMembers('<?= $team['id'] ?>')"

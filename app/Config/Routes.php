@@ -16,6 +16,8 @@ $routes->get('/logout', 'LoginController::logout');
 // Resend verification email
 $routes->get('/resend-email', 'RegisterController::resendVerificationForm');
 $routes->post('/resend-email', 'RegisterController::resendVerification');
+$routes->get('team/pdf/(:segment)', 'Inspector\PortfolioController::team/$1');
+$routes->get('portfolio/pdf/(:segment)', 'Inspector\PortfolioController::pdf/$1');
 
 
 // Dashboard umum
@@ -62,7 +64,8 @@ $routes->group('inspector', ['filter' => 'role:inspector'], function ($routes) {
     $routes->get('portfolio/(:segment)', 'Inspector\PortfolioController::pdf/$1');
     $routes->get('portfolio/preview/(:segment)', 'Inspector\PortfolioController::preview/$1');
     $routes->get('teams', 'Admin\DashboardController::teams');
-
+    $routes->get('team/(:segment)', 'Inspector\PortfolioController::team/$1');
+    
 });
 
 // Owner Group

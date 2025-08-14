@@ -8,6 +8,7 @@ use App\Models\BiodataModel;
 use App\Models\UserModel;
 use App\Models\Achivement;
 use App\Models\TeamMemberModel;
+use App\Models\TeamModel;
 use Mpdf\Mpdf;
 use Endroid\QrCode\Color\Color;
 use Endroid\QrCode\Encoding\Encoding;
@@ -22,7 +23,7 @@ class PortfolioController extends BaseController
 {
     public function pdf($userId)
     {
-        $text = base_url() . "inspector/portfolio/" . $userId;
+        $text = base_url() . "portfolio/pdf/" . $userId;
         // --- Generate QR Code ---
         $writer = new PngWriter();
         $qrCode = new QrCode(
@@ -85,7 +86,7 @@ class PortfolioController extends BaseController
             'margin_left'  => 12,
             'margin_right' => 12,
             'margin_top'   => 18,
-            'margin_bottom' => 18,
+            'margin_bottom' => 80,
             'default_font' => 'dejavusans', // aman unicode
         ]);
 
@@ -93,7 +94,23 @@ class PortfolioController extends BaseController
         $mpdf->SetTitle('Portfolio - ' . ($user['name'] ?? 'User'));
         $mpdf->SetAuthor('Sistem');
         $mpdf->SetHeader('Portfolio|' . $user['name'] . '|{PAGENO}');
-        $mpdf->SetFooter('Dicetak: {DATE d-m-Y H:i}||Hal. {PAGENO}/{nbpg}');
+        $mpdf->SetFooter('    <div style="position: relative; height: 55px;">
+        <!-- QR di kanan atas -->
+        <div style="position: absolute; right: 0; top: 0; padding-bottom: 20px; text-align: right;">
+            <p style="font-size: 10pt; margin: 0;">Scan QR untuk melihat keaslian</p>
+            <img src="' . $qr->getDataUri() . '" width="150" height="150" style="display: inline-block;">
+        </div>
+        <!-- Garis bawah QR -->
+        <div style="position: absolute; bottom: 0; left: 0; right: 0;">
+            <hr style="border: none; border-top: 1px solid #ccc; margin: 0;">
+        </div>
+    </div>
+    <table width="100%" style="padding-top:2px; font-size:10pt;">
+        <tr>
+            <td style="text-align:left;">Dicetak: {DATE d-m-Y H:i}</td>
+            <td style="text-align:right;">Hal. {PAGENO}/{nbpg}</td>
+        </tr>
+    </table>');
 
         // CSS kecil (boleh juga dipisah ke file CSS dan di-embed)
         $stylesheet = '
@@ -204,13 +221,6 @@ class PortfolioController extends BaseController
         }
 
         ';
-        $mpdf->WriteFixedPosHTML(
-            '<img src="' . $qr->getDataUri() . '" alt="QR Code">',
-            160, // X posisi dari kiri (mm)
-            120, // Y posisi dari atas (mm)
-            40,  // Lebar (mm)
-            40   // Tinggi (mm)
-        );
         $mpdf->WriteHTML($stylesheet, \Mpdf\HTMLParserMode::HEADER_CSS);
         $mpdf->WriteHTML($html, \Mpdf\HTMLParserMode::HTML_BODY);
 
@@ -218,6 +228,191 @@ class PortfolioController extends BaseController
         return $this->response
             ->setContentType('application/pdf')
             ->setBody($mpdf->Output('Portfolio-' . $user['name'] . '.pdf', 'I')); // 'I' inline, 'D' download
+    }
+    public function team($userId)
+    {
+        $text = base_url() . "team/pdf/" . $userId;
+        // --- Generate QR Code ---
+        $writer = new PngWriter();
+        $qrCode = new QrCode(
+            data: $text,
+            encoding: new Encoding('UTF-8'),
+            errorCorrectionLevel: ErrorCorrectionLevel::Low,
+            size: 300,
+            margin: 10,
+            roundBlockSizeMode: RoundBlockSizeMode::Margin,
+            foregroundColor: new Color(0, 0, 0),
+            backgroundColor: new Color(255, 255, 255)
+        );
+        $logo = new Logo(
+            path: FCPATH . 'assets/images/logo-aquatic.png',
+            resizeToWidth: 130,
+            punchoutBackground: false
+        );
+        $qr = $writer->write($qrCode, $logo);
+
+        // --- Ambil data utama ---
+        $teamModel = new TeamModel();
+        $DataMember = $teamModel->getMemberByTeamId($userId); // ambil data tim jika ada
+        $team = $teamModel->where('id', $userId)->first();
+        $dataTeam = $teamModel->getTeamByOwnerId($team['owner_id']);
+        $html = view('inspector/team_pdf', [
+            'team'      => $dataTeam,
+            'DataMembers' => $DataMember,
+            'qrSrc'     => $qr->getDataUri(),
+        ]);
+
+        $mpdf = new Mpdf([
+            'mode'         => 'utf-8',
+            'format'       => 'A4',
+            'orientation'  => 'P',
+            'margin_left'  => 12,
+            'margin_right' => 12,
+            'margin_top'   => 18,
+            'margin_bottom' => 80,
+            'default_font' => 'dejavusans', // aman unicode
+        ]);
+
+        $mpdf->SetTitle('Portfolio - ' . ($dataTeam['name'] ?? 'User'));
+        $mpdf->SetAuthor('Sistem');
+        $mpdf->SetHeader('Portfolio|' . $dataTeam['name'] . '|{PAGENO}');
+
+        $mpdf->SetFooter('    <div style="position: relative; height: 55px;">
+        <!-- QR di kanan atas -->
+        <div style="position: absolute; right: 0; top: 0; padding-bottom: 20px; text-align: right;">
+            <p style="font-size: 10pt; margin: 0;">Scan QR untuk melihat keaslian</p>
+            <img src="' . $qr->getDataUri() . '" width="150" height="150" style="display: inline-block;">
+        </div>
+        <!-- Garis bawah QR -->
+        <div style="position: absolute; bottom: 0; left: 0; right: 0;">
+            <hr style="border: none; border-top: 1px solid #ccc; margin: 0;">
+        </div>
+    </div>
+    <table width="100%" style="padding-top:2px; font-size:10pt;">
+        <tr>
+            <td style="text-align:left;">Dicetak: {DATE d-m-Y H:i}</td>
+            <td style="text-align:right;">Hal. {PAGENO}/{nbpg}</td>
+        </tr>
+    </table>');
+
+        $stylesheet = '
+        body {
+        font-family: sans-serif;
+        font-size: 12pt;
+        color: #000;
+        }
+
+
+
+        /* Header berbasis tabel agar kompatibel mPDF */
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+        }
+        .header-table td {
+            vertical-align: middle;  /* sejajarkan secara vertikal */
+            padding: 0;
+        }
+
+        /* Kolom logo dan ukuran logo */
+        .logo-cell { width: 22mm; }      /* ruang tetap di kiri */
+        .logo {
+            width: 16mm;                 /* kecilkan logo di PDF */
+            height: auto;
+            display: block;
+        }
+
+        /* Kolom judul di tengah */
+        .title-cell { text-align: center; }
+        .title-cell h2 {
+            margin: 0;
+            font-size: 18pt;
+            font-weight: bold;
+        }
+        .title-cell .sub-title {
+            margin-top: 3px;
+            font-size: 12pt;
+            color: #555;
+        }
+
+        /* Judul section */
+        h2, h3 {
+            text-align: center;
+            margin: 0;
+        }
+
+        /* Tabel biodata */
+        .biodata {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        .biodata td {
+            padding: 4px 6px;
+            vertical-align: top;
+        }
+
+        .biodata .label {
+            width: 160px;
+            font-weight: bold;
+        }
+
+        /* Foto profil */
+        .thumbnail {
+            width: 200px;
+            height: 200px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .photo {
+            text-align: center;
+        }
+
+        .photo img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        /* Tabel riwayat kejuaraan */
+        table.achievements {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        table.achievements th,
+        table.achievements td {
+            border: 1px solid #000;
+            padding: 4px 6px;
+            text-align: center;
+            font-size: 10pt;
+        }
+
+        table.achievements th {
+            background: #f0f0f0;
+        }
+
+        /* Catatan bawah */
+        .note {
+            font-size: 10pt;
+            margin-top: 10px;
+        }
+
+        ';
+
+        $mpdf->WriteHTML($stylesheet, \Mpdf\HTMLParserMode::HEADER_CSS);
+        $mpdf->WriteHTML($html, \Mpdf\HTMLParserMode::HTML_BODY);
+
+        // Output ke browser (download atau inline)
+        return $this->response
+            ->setContentType('application/pdf')
+            ->setBody($mpdf->Output('Portfolio-' . $dataTeam['name'] . '.pdf', 'I'));
     }
     public function preview($userId)
     {
