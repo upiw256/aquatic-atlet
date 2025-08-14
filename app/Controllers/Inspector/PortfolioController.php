@@ -21,8 +21,19 @@ use Endroid\QrCode\Writer\PngWriter;
 
 class PortfolioController extends BaseController
 {
+    function isValidUuid($uuid) {
+        return preg_match(
+            '/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i',
+            $uuid
+        ) === 1;
+    }
     public function pdf($userId)
     {
+        if (!$this->isValidUuid($userId)) {
+            return redirect()->to('/inspector/members')
+                ->with('error', 'ID Anggota tidak valid. Pastikan ID yang dimasukkan benar.')
+                ->withInput();
+        }
         $text = base_url() . "portfolio/pdf/" . $userId;
         // --- Generate QR Code ---
         $writer = new PngWriter();
@@ -50,7 +61,7 @@ class PortfolioController extends BaseController
         $team = new TeamMemberModel();
         // cek biodata jika kosong, kembalikan error dengan redirect
         if (!$biodataModel->getByUserId($userId)) {
-            return redirect()->to('/inspector/admin/members')
+            return redirect()->to('/inspector/members')
                 ->with('error', 'Biodata tidak ditemukan. Beritahukan anggota untuk mengisi biodata terlebih dahulu.')
                 ->withInput();
         }
@@ -64,6 +75,9 @@ class PortfolioController extends BaseController
         $achievements = $achievementModel->getMemberByUserid($userId);    // array of assoc (tahun, nama, penyelenggara, peringkat/dll)
         $userbybiodata = $biodataModel->getDataFormUser($userId); // ambil data biodata lengkap dengan user info
         $dataTeam = $team->getTeamByMember($userId); // ambil data tim jika ada
+        if (!$biodata) {
+            return $this->response->setStatusCode(404, 'Biodata tidak ditemukan');
+        }
         // --- Siapkan path foto (pakai file system path agar aman di mPDF) ---
         $fileName   = $biodata['photo'] ?? null; // misal kolom 'photo' simpan nama file
         $absPhoto   = FCPATH . $fileName ? FCPATH . 'uploads/photos/' . $fileName : null;
@@ -221,6 +235,8 @@ class PortfolioController extends BaseController
         }
 
         ';
+        $mpdf->SetWatermarkImage(FCPATH . 'assets/images/logo-aquatic.png', 0.2); // 0.2 = transparansi
+        $mpdf->showWatermarkImage = true;
         $mpdf->WriteHTML($stylesheet, \Mpdf\HTMLParserMode::HEADER_CSS);
         $mpdf->WriteHTML($html, \Mpdf\HTMLParserMode::HTML_BODY);
 
@@ -231,6 +247,11 @@ class PortfolioController extends BaseController
     }
     public function team($userId)
     {
+        if (!$this->isValidUuid($userId)) {
+            return redirect()->to('/inspector/teams')
+                ->with('error', 'ID Anggota tidak valid. Pastikan ID yang dimasukkan benar.')
+                ->withInput();
+        }
         $text = base_url() . "team/pdf/" . $userId;
         // --- Generate QR Code ---
         $writer = new PngWriter();
@@ -255,7 +276,15 @@ class PortfolioController extends BaseController
         $teamModel = new TeamModel();
         $DataMember = $teamModel->getMemberByTeamId($userId); // ambil data tim jika ada
         $team = $teamModel->where('id', $userId)->first();
+        if (empty($team['owner_id'])) {
+            return redirect()->to('/inspector/teams')
+                ->with('error', 'Biodata tidak ditemukan. Beritahukan anggota untuk mengisi biodata terlebih dahulu.')
+                ->withInput();
+        }
         $dataTeam = $teamModel->getTeamByOwnerId($team['owner_id']);
+        if (!$DataMember) {
+            return $this->response->setStatusCode(404, 'Team tidak ditemukan');
+        }
         $html = view('inspector/team_pdf', [
             'team'      => $dataTeam,
             'DataMembers' => $DataMember,
@@ -405,7 +434,8 @@ class PortfolioController extends BaseController
         }
 
         ';
-
+        $mpdf->SetWatermarkImage(FCPATH . 'assets/images/logo-aquatic.png', 0.2); // 0.2 = transparansi
+        $mpdf->showWatermarkImage = true;
         $mpdf->WriteHTML($stylesheet, \Mpdf\HTMLParserMode::HEADER_CSS);
         $mpdf->WriteHTML($html, \Mpdf\HTMLParserMode::HTML_BODY);
 

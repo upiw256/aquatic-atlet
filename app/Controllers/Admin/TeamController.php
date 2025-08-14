@@ -213,46 +213,50 @@ class TeamController extends BaseController
     }
 
     public function delete($id)
-{
-    $teamModel = new TeamModel();
-    $memberModel = new TeamMemberModel();
-    $userModel = new UserModel();
+    {
+        $teamModel = new TeamModel();
+        $memberModel = new TeamMemberModel();
+        $userModel = new UserModel();
 
-    // Ambil data tim (owner_id ada di sini)
-    $team = $teamModel->find($id);
-    if (!$team) {
+        // Ambil data tim (owner_id ada di sini)
+        $team = $teamModel->find($id);
+        if (!$team) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Tim tidak ditemukan.'
+            ])->setStatusCode(404);
+        }
+
+        $ownerId = $team['owner_id'];
+
+        // Hitung jumlah anggota selain owner
+        $jumlahAnggota = $memberModel
+            ->where('team_id', $id)
+            ->where('id !=', $ownerId)
+            ->countAllResults();
+
+        if ($jumlahAnggota > 0) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Tidak bisa menghapus tim ini karena masih ada anggota selain owner.'
+            ])->setStatusCode(400);
+        }
+
+        // Ubah role owner jadi member
+        $userModel->update($ownerId, ['role' => 'member']);
+        //hapus logo
+        $logoPath = ROOTPATH . 'public/uploads/logo/' . $team['logo'];
+        if (file_exists($logoPath)) {
+            unlink($logoPath);
+        }
+        // Hapus tim
+        $teamModel->delete($id);
+
         return $this->response->setJSON([
-            'status' => 'error',
-            'message' => 'Tim tidak ditemukan.'
-        ])->setStatusCode(404);
+            'status' => 'success',
+            'message' => 'Tim berhasil dihapus dan role owner diubah menjadi member.'
+        ]);
     }
-
-    $ownerId = $team['owner_id'];
-
-    // Hitung jumlah anggota selain owner
-    $jumlahAnggota = $memberModel
-        ->where('team_id', $id)
-        ->where('id !=', $ownerId)
-        ->countAllResults();
-
-    if ($jumlahAnggota > 0) {
-        return $this->response->setJSON([
-            'status' => 'error',
-            'message' => 'Tidak bisa menghapus tim ini karena masih ada anggota selain owner.'
-        ])->setStatusCode(400);
-    }
-
-    // Ubah role owner jadi member
-    $userModel->update($ownerId, ['role' => 'member']);
-
-    // Hapus tim
-    $teamModel->delete($id);
-
-    return $this->response->setJSON([
-        'status' => 'success',
-        'message' => 'Tim berhasil dihapus dan role owner diubah menjadi member.'
-    ]);
-}
 
 
     public function deleteLogo($id)
