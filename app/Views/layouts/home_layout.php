@@ -254,6 +254,15 @@
         });
     </script>
     <?php endif; ?>
+    <?php if (session()->getFlashdata('error')): ?>
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: '<?= session()->getFlashdata('error') ?>',
+        });
+    </script>
+    <?php endif; ?>
 
     <!-- Script untuk pencarian -->
     <script>

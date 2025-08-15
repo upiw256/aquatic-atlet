@@ -40,4 +40,17 @@ class Achivement extends Model
             ->orderBy('users.name')
             ->findAll();
     }
+    public function getMemberByUserid($userId)
+    {
+        return $this->select('
+                achivements.*,
+                users.name AS member_name,
+                teams.name AS team_name
+            ')
+            ->join('team_members', 'team_members.id = achivements.member_id')
+            ->join('users', 'users.id = team_members.member_id')
+            ->join('teams', 'teams.id = team_members.team_id')
+            ->where('users.id', $userId)
+            ->findAll();
+    }
 }

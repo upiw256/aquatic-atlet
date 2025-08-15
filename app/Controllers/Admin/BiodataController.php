@@ -33,6 +33,13 @@ class BiodataController extends BaseController
             'phone'      => $this->request->getPost('phone'),
         ];
 
+            if (! $biodataModel->validate($data)) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', $biodataModel->errors());
+            }
+
+
         $existing = $biodataModel->where('user_id', $userId)->first();
 
         if ($existing) {
@@ -41,6 +48,6 @@ class BiodataController extends BaseController
             $biodataModel->insert($data);
         }
 
-        return redirect()->back()->with('success', 'Biodata berhasil disimpan.');
+        return redirect()->back()->with('success', 'Biodata berhasil disimpan. :)');
     }
 }

@@ -1,10 +1,10 @@
-<?= $this->extend('layouts/admin_layout') ?>
+<?= $this->extend('layouts/' . session()->get('role') . '_layout') ?>
 <?= $this->section('content') ?>
 <div class="container mt-4">
     <h1>Kelola Tim</h1>
-
-    <a href="/admin/teams/create" class="btn btn-primary mb-3">+ Buat Tim Baru</a>
-
+    <?php if (session()->get('role') === 'admin'): ?>
+        <a href="/admin/teams/create" class="btn btn-primary mb-3">+ Buat Tim Baru</a>
+    <?php endif; ?>
     <table id="team" class="table table-striped">
         <thead class="table-dark">
             <tr>
@@ -24,17 +24,23 @@
                     <td><?= esc($team['owner_name'] ?? '-') ?></td>
                     <td><?= esc($team['member_count']) ?></td>
                     <td>
+                        <?php if (session()->get('role') === 'inspector'): ?>
+                            <a href="/inspector/team/<?= $team['id'] ?>" class="btn btn-sm btn-primary"><i class="ti ti-printer"></i> Print</a>
+                        <?php endif; ?>
                         <button
                             onclick="showMembers('<?= $team['id'] ?>')"
                             class="btn btn-sm btn-info">
+                            <i class="ti ti-eye"></i>
                             Lihat
                         </button>
-                        <a href="/admin/teams/edit/<?= $team['id'] ?>" class="btn btn-sm btn-warning">Edit</a>
-                        <button
-                            onclick="deleteTeam('<?= $team['id'] ?>')"
-                            class="btn btn-sm btn-danger">
-                            Hapus
-                        </button>
+                        <?php if (session()->get('role') === 'admin'): ?>
+                            <a href="/admin/teams/edit/<?= $team['id'] ?>" class="btn btn-sm btn-warning">Edit</a>
+                            <button
+                                onclick="deleteTeam('<?= $team['id'] ?>')"
+                                class="btn btn-sm btn-danger">
+                                Hapus
+                            </button>
+                        <?php endif; ?>
                     </td>
                 </tr>
             <?php endforeach ?>

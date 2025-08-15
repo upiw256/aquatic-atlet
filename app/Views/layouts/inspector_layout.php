@@ -5,28 +5,24 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <base href="<?= base_url() ?>/">
-    <title><?= $title ?? 'Admin Area' ?></title>
+    <title><?= $title ?? 'Inspector Area' ?></title>
     <!-- Styles -->
-    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" /> -->
-    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" /> -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
     <!-- Or for RTL support -->
-    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.rtl.min.css" /> -->
 
     <!-- Scripts -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.0/dist/jquery.slim.min.js"></script> -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script> -->
-    <!-- <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script> -->
     <link rel="shortcut icon" type="image/png" href="../assets/images/logo-aquatic.png" />
     <link rel="stylesheet" href="../assets/css/styles.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" /> -->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js "></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/css/bootstrap.min.css"></link>
-    <link href="https://cdn.datatables.net/2.3.2/css/dataTables.bootstrap5.css"></link>
-    <link href="https://cdn.datatables.net/responsive/3.0.5/css/responsive.dataTables.css"></link>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/css/bootstrap.min.css">
+    </link>
+    <link href="https://cdn.datatables.net/2.3.2/css/dataTables.bootstrap5.css">
+    </link>
+    <link href="https://cdn.datatables.net/responsive/3.0.5/css/responsive.dataTables.css">
+    </link>
 </head>
 
 <body>
@@ -37,7 +33,7 @@
                 <div class="brand-logo d-flex align-items-center justify-content-between">
                     <a href="/member/dashboard" class="text-nowrap logo-img">
                         <img src="../assets/images/logo-aquatic.png" width="50" alt="" />
-                        <span class="logo-name text-truncate"> Dashboard Admin</span>
+                        <span class="logo-name text-truncate"> Dashboard Pengawas</span>
                     </a>
                     <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
                         <i class="ti ti-x fs-6"></i>
@@ -51,7 +47,7 @@
                             <span class="hide-menu">Home</span>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="/admin/dashboard" aria-expanded="false">
+                            <a class="sidebar-link" href="/inspector/dashboard" aria-expanded="false">
                                 <i class="ti ti-dashboard"></i>
                                 <span class="hide-menu">Dashboard</span>
                             </a>
@@ -63,24 +59,18 @@
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="/admin/teams" aria-expanded="false">
+                            <a class="sidebar-link" href="/inspector/teams" aria-expanded="false">
                                 <i class="ti ti-atom"></i>
                                 <span class="hide-menu">Team</span>
                             </a>
                         </li>
                         <li class="sidebar-item">
-                            <a class="sidebar-link" href="/admin/users" aria-expanded="false">
-                                <i class="ti ti-users"></i>
-                                <span class="hide-menu">User Management</span>
-                            </a>
-                        </li>
-                        <li class="sidebar-item">
-                            <a class="sidebar-link" href="/admin/achivements" aria-expanded="false">
+                            <a class="sidebar-link" href="/inspector/achivements" aria-expanded="false">
                                 <i class="ti ti-trophy"></i>
                                 <span class="hide-menu">Penghargaan</span>
                             </a>
                         </li>
-                        
+
                     </ul>
                     <ul class="sidebar-nav mt-4">
                         <li class="nav-small-cap">
@@ -149,9 +139,7 @@
     <script src="../assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../assets/js/sidebarmenu.js"></script>
     <script src="../assets/js/app.min.js"></script>
-    <!-- <script src="../assets/libs/apexcharts/dist/apexcharts.min.js"></script> -->
     <script src="../assets/libs/simplebar/dist/simplebar.js"></script>
-    <!-- <script src="../assets/js/dashboard.js"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.3.2/js/dataTables.bootstrap5.js"></script>
@@ -159,8 +147,6 @@
     <script src="https://cdn.datatables.net/responsive/3.0.5/js/dataTables.responsive.js"></script>
     <!-- solar icons -->
     <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
-    <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
-    <!-- <script src=" https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js "></script> -->
     <script>
         function assignOwner(teamId) {
             Swal.fire({
@@ -248,20 +234,20 @@
                 }
             });
         }
-        new DataTable('#team',{
+        new DataTable('#team', {
             responsive: {
                 details: {
                     display: $.fn.dataTable.Responsive.display.childRowImmediate
                 }
             }
-        });    
+        });
         new DataTable('#userTable', {
             responsive: {
                 details: {
                     display: $.fn.dataTable.Responsive.display.childRowImmediate
                 }
             }
-        });    
+        });
     </script>
 </body>
 

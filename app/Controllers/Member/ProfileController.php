@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Models\BiodataModel;
 use App\Models\UserModel;
 use Ramsey\Uuid\Uuid;
+use Config\Services;
 
 class ProfileController extends BaseController
 {
@@ -26,62 +27,70 @@ class ProfileController extends BaseController
 
     public function save()
     {
-        try {
-            $this->validate([
-                'nik'            => 'permit_empty|max_length[20]',
-                'fullname'       => 'required|max_length[255]',
-                'gender'         => 'permit_empty|in_list[laki-laki,perempuan]',
-                'birth_place'    => 'permit_empty|max_length[100]',
-                'birth_date'     => 'permit_empty|valid_date',
-                'religion'       => 'permit_empty|max_length[20]',
-                'marital_status' => 'permit_empty|in_list[menikah,belum]',
-                'education'      => 'permit_empty|max_length[50]',
-                'occupation'     => 'permit_empty|max_length[100]',
-                'address'        => 'permit_empty',
-                'phone'          => 'permit_empty|max_length[20]',
-                'photo'          => 'permit_empty|max_length[255]',
-            ]);
+        $userId = session('user_id');
+        $biodataModel = new BiodataModel();
+        $userModel = new UserModel();
 
-            $userId = session('user_id');
-            $biodataModel = new BiodataModel();
-            $userModel = new UserModel();
-            $data = [
-                'user_id'        => $userId,
-                'nik'            => $this->request->getPost('nik'),
-                'name'       => $this->request->getPost('fullname'),
-                'gender'         => $this->request->getPost('gender'),
-                'birth_place'    => $this->request->getPost('birth_place'),
-                'birth_date'     => $this->request->getPost('birth_date'),
-                'religion'       => $this->request->getPost('religion'),
-                'marital_status' => $this->request->getPost('marital_status'),
-                'education'      => $this->request->getPost('education'),
-                'occupation'     => $this->request->getPost('occupation'),
-                'address'        => $this->request->getPost('address'),
-                'phone'          => $this->request->getPost('phone'),
-            ];
+        $uploadedPhoto = $this->request->getFile('photo');
 
-            // Handle upload foto
-            $file = $this->request->getFile('photo');
-            if ($file && $file->isValid() && !$file->hasMoved()) {
-                $newName = $file->getRandomName();
-                $file->move('uploads/photos/', $newName);
-                $data['photo'] = 'uploads/photos/' . $newName;
+        $biodataData = [
+            'user_id'        => $userId,
+            'nik'            => $this->request->getPost('nik'),
+            'gender'         => $this->request->getPost('gender'),
+            'birth_place'    => $this->request->getPost('birth_place'),
+            'birth_date'     => $this->request->getPost('birth_date'),
+            'religion'       => $this->request->getPost('religion'),
+            'marital_status' => $this->request->getPost('marital_status'),
+            'education'      => $this->request->getPost('education'),
+            'occupation'     => $this->request->getPost('occupation'),
+            'address'        => $this->request->getPost('address'),
+            'phone'          => $this->request->getPost('phone')
+        ];
+
+        if ($uploadedPhoto && $uploadedPhoto->isValid() && !$uploadedPhoto->hasMoved()) {
+            $extension = $uploadedPhoto->getExtension() ?: $uploadedPhoto->guessExtension();
+            $photoFileName = 'Profil_' . $userId . '.' . $extension;
+            $targetPath = FCPATH . 'uploads/photos/' . $photoFileName;
+    
+            // Hapus foto lama jika ekstensi berbeda
+            $oldPhoto = $this->request->getPost('old_photo');
+            if ($oldPhoto && file_exists(FCPATH . $oldPhoto)) {
+                $oldExtension = pathinfo($oldPhoto, PATHINFO_EXTENSION);
+                if (strtolower($oldExtension) !== strtolower($extension)) {
+                    unlink(FCPATH . $oldPhoto);
+                }
             }
-
-            $existing = $biodataModel->where('user_id', $userId)->first();
-
-            if ($existing) {
-                $biodataModel->update($existing['id'], $data);
-            } else {
-                $data['id'] = Uuid::uuid4()->toString();
-                $biodataModel->insert($data);
-            }
-            $userModel->update($userId, [
-                'name' => $this->request->getPost('fullname'),
-            ]);
-            return redirect()->back()->with('success', 'Biodata berhasil disimpan.');
-        } catch (\Exception $e) {
-            return redirect()->back()->withInput()->with('error', $e->getMessage());
+    
+            // PROSES RESIZE DULU SEBELUM MOVE
+            \Config\Services::image()
+                ->withFile($uploadedPhoto) // Gunakan objek file langsung
+                ->fit(300, 300, 'center')
+                ->save($targetPath);
+    
+            // Update path di database
+            $biodataData['photo'] = 'uploads/photos/' . $photoFileName;
+    
+            // Pindahkan file asli (jika ingin menyimpan versi original)
+            // $uploadedPhoto->move(FCPATH . 'uploads/photos/original/', $photoFileName); // Opsional
+    
+        } else {
+            $biodataData['photo'] = $this->request->getPost('old_photo');
         }
+
+        // Simpan biodata
+        $existingBiodata = $biodataModel->where('user_id', $userId)->first();
+        if ($existingBiodata) {
+            $biodataModel->update($existingBiodata['id'], $biodataData);
+            $message = "Biodata berhasil diperbarui.";
+        } else {
+            $biodataData['id'] = Uuid::uuid4()->toString();
+            $biodataModel->insert($biodataData);
+            $message = "Biodata berhasil disimpan.";
+        }
+
+        // Update nama user
+        $userModel->update($userId, ['name' => $this->request->getPost('fullname')]);
+
+        return redirect()->back()->with('success', $message);
     }
 }
