@@ -63,13 +63,13 @@
                                 <i class="ti ti-atom"></i>
                                 <span class="hide-menu">Team</span>
                             </a>
-                        </li>
+                        <!-- </li>
                         <li class="sidebar-item">
                             <a class="sidebar-link" href="/inspector/achivements" aria-expanded="false">
                                 <i class="ti ti-trophy"></i>
                                 <span class="hide-menu">Penghargaan</span>
                             </a>
-                        </li>
+                        </li> -->
 
                     </ul>
                     <ul class="sidebar-nav mt-4">

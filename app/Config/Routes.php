@@ -34,6 +34,8 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->put('users/updateRole/', 'Admin\DashboardController::makeAdmin');
     $routes->get('members', 'Admin\DashboardController::members');
     $routes->get('teams', 'Admin\DashboardController::teams');
+    $routes->get('email-settings', 'Admin\SettingEmailController::index');
+    $routes->post('email-settings/save', 'Admin\SettingEmailController::save');
 
     // Teams
     $routes->get('teams/create', 'Admin\TeamController::create');
@@ -65,7 +67,6 @@ $routes->group('inspector', ['filter' => 'role:inspector'], function ($routes) {
     $routes->get('portfolio/preview/(:segment)', 'Inspector\PortfolioController::preview/$1');
     $routes->get('teams', 'Admin\DashboardController::teams');
     $routes->get('team/(:segment)', 'Inspector\PortfolioController::team/$1');
-    
 });
 
 // Owner Group
