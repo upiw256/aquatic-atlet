@@ -120,9 +120,10 @@ class TeamController extends BaseController
         $owners = $owners === '' ? null : $owners;
 
         $logoName = null;
+        $logoPath = '/home/user/coba.sman1margaasih.sch.id/uploads/logo/';
         if ($logoFile && $logoFile->isValid() && !$logoFile->hasMoved()) {
             $logoName = $logoFile->getRandomName();
-            $logoFile->move(ROOTPATH . 'public/uploads/logo/', $logoName);
+            $logoFile->move($logoPath, $logoName);
         }
 
         $teamModel = new TeamModel();
