@@ -9,14 +9,21 @@ $routes->get('/', 'Home::index');
 $routes->get('/team-detail/(:segment)', 'Home::teamDetail/$1');
 $routes->get('/register', 'RegisterController::index');
 $routes->post('/register', 'RegisterController::store');
+$routes->get('/verify-email/(:segment)', 'RegisterController::verify/$1');
 $routes->get('/login', 'LoginController::index');
 $routes->post('/login', 'LoginController::authenticate');
 $routes->get('/logout', 'LoginController::logout');
+// Resend verification email
+$routes->get('/resend-email', 'RegisterController::resendVerificationForm');
+$routes->post('/resend-email', 'RegisterController::resendVerification');
+$routes->get('team/pdf/(:segment)', 'Inspector\PortfolioController::team/$1');
+$routes->get('portfolio/pdf/(:segment)', 'Inspector\PortfolioController::pdf/$1');
+
 
 // Dashboard umum
-$routes->get('/dashboard', 'DashboardController::index', ['filter' => 'role:admin,owner,member']);
-$routes->get('/member/profile', 'Member\ProfileController::index', ['filter' => 'role:admin,owner,member']);
-$routes->post('/member/profile/save', 'Member\ProfileController::save', ['filter' => 'role:admin,owner,member']);
+$routes->get('/dashboard', 'DashboardController::index', ['filter' => 'role:admin,owner,member,inspector']);
+$routes->get('/member/profile', 'Member\ProfileController::index', ['filter' => 'role:admin,owner,member,inspector']);
+$routes->post('/member/profile/save', 'Member\ProfileController::save', ['filter' => 'role:admin,owner,member,inspector']);
 // Admin Group
 $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->get('/', 'Admin\DashboardController::index');
@@ -24,9 +31,11 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->get('users/search', 'Admin\DashboardController::search');
     $routes->get('users', 'Admin\DashboardController::users');
     $routes->put('users/reset/(:segment)', 'Admin\DashboardController::usersReset/$1');
-    $routes->put('makeadmin/(:segment)', 'Admin\DashboardController::makeAdmin/$1');
+    $routes->put('users/updateRole/', 'Admin\DashboardController::makeAdmin');
     $routes->get('members', 'Admin\DashboardController::members');
     $routes->get('teams', 'Admin\DashboardController::teams');
+    $routes->get('email-settings', 'Admin\SettingEmailController::index');
+    $routes->post('email-settings/save', 'Admin\SettingEmailController::save');
 
     // Teams
     $routes->get('teams/create', 'Admin\TeamController::create');
@@ -48,6 +57,16 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     // Biodata
     $routes->get('biodata/edit/(:uuid)', 'Admin\BiodataController::edit/$1');
     $routes->post('biodata/save/(:uuid)', 'Admin\BiodataController::save/$1');
+});
+
+// Inspector Group
+$routes->group('inspector', ['filter' => 'role:inspector'], function ($routes) {
+    $routes->get('dashboard', 'Inspector\DashboardController::index');
+    $routes->get('members', 'Admin\DashboardController::members');
+    $routes->get('portfolio/(:segment)', 'Inspector\PortfolioController::pdf/$1');
+    $routes->get('portfolio/preview/(:segment)', 'Inspector\PortfolioController::preview/$1');
+    $routes->get('teams', 'Admin\DashboardController::teams');
+    $routes->get('team/(:segment)', 'Inspector\PortfolioController::team/$1');
 });
 
 // Owner Group

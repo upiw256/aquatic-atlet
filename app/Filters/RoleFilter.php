@@ -32,7 +32,7 @@ class RoleFilter implements FilterInterface
 
         // Jika role spesifik diberikan dalam argumen
         if ($arguments && !in_array(session()->get('role'), $arguments)) {
-            return redirect()->to('/')->with('error', 'Akses ditolak: role tidak diizinkan.');
+            return redirect()->to('/'.session()->get('role').'/dashboard')->with('error', 'Akses ditolak: role tidak diizinkan.');
         }
     }
 

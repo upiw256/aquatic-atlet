@@ -23,17 +23,18 @@ class AdminSeeder extends Seeder
 
         // $this->db->table('users')->insert($data);
 
-                for ($i = 0; $i < 50; $i++) {
-            $roles = ['member', 'admin', 'owner'];
+
+
             $data = [
                 'id'       => Uuid::uuid4()->toString(),
                 'name'     => $faker->name,
                 'email'    => $faker->unique()->safeEmail,
                 'password' => password_hash('123456', PASSWORD_DEFAULT),
-                'role'     => 'member', // Set default role to member
+                'role'     => 'admin',
+                'is_verified' => true,
             ];
 
             $this->db->table('users')->insert($data);
-        }
+            
     }
 }

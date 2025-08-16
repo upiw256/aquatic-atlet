@@ -55,6 +55,20 @@ class TeamModel extends Model
 
     public function getTeamByOwnerId($ownerId)
     {
-        return $this->where('owner_id', $ownerId)->first();
+        return $this->select('teams.*, users.name AS owner_name, users.email AS owner_email')
+            ->join('users', 'users.id = teams.owner_id', 'left')
+            ->where('teams.owner_id', $ownerId)
+            ->first();
+    }
+
+    public function getMemberByTeamId($teamId)
+    {
+        return $this->db->table('team_members')
+            ->select('team_members.*, users.name, users.email, biodata.gender, biodata.birth_date, biodata.birth_place, biodata.photo')
+            ->join('users', 'users.id = team_members.member_id', 'left')
+            ->join('biodata', 'biodata.user_id = users.id', 'left')
+            ->where('team_members.team_id', $teamId)
+            ->get()
+            ->getResultArray();
     }
 }

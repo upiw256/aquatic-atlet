@@ -4,10 +4,12 @@ namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
 use App\Models\BiodataModel;
+use App\Models\EmailSettingsModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\UserModel;
 use App\Models\TeamModel;
 use App\Models\TeamMemberModel;
+use Config\Email;
 
 class DashboardController extends BaseController
 {
@@ -16,11 +18,16 @@ class DashboardController extends BaseController
         $userModel = new UserModel();
         $teamModel = new TeamModel();
         $biodata = new BiodataModel();
+        $settings = new EmailSettingsModel();
         // Cek apakah sudah isi biodata
         $userId = session('user_id');
         $biodata = $biodata->where('user_id', $userId)->first();
+        $setting = $settings->findAll();
         if (!$biodata) {
             return redirect()->to('/member/profile')->with('warning', 'Anda harus mengisi biodata terlebih dahulu sebelum mengakses dashboard.');
+        }
+        if (!$setting) {
+            return redirect()->to('/admin/email-settings')->with('warning', 'Anda harus mengisi Setting Email terlebih dahulu sebelum mengakses dashboard.');
         }
         $memberCount = $userModel->where('role', 'member')->countAllResults();
         $teamCount   = $teamModel->countAllResults();
@@ -33,6 +40,8 @@ class DashboardController extends BaseController
     {
         $userModel = new UserModel();
         $biodataTeamMemberModel = new TeamMemberModel();
+        $sessionRole = session()->get('role'); //inspector
+
         // Ambil query builder
         $builder = $userModel->getMembersWithTeam();
 
@@ -40,43 +49,77 @@ class DashboardController extends BaseController
         $members = $builder
             ->get()
             ->getResultArray();
-
-        // dd($biodataTeamMemberModel);
         foreach ($members as &$member) {
             $member['team'] = $biodataTeamMemberModel->getTeamByMember($member['id']);
+        }
+        // Filter khusus jika role inspector
+        if ($sessionRole === 'inspector') {
+            $members = array_filter($members, function ($m) {
+                return !empty($m['team']); // hanya yang punya team
+            });
+            // Reset index array
+            $members = array_values($members);
         }
         return view('admin/members', [
             'members' => $members,
         ]);
     }
 
-    public function makeAdmin($id)
+    public function makeAdmin()
     {
-        $userModel = new UserModel();
-        $getTeamByMember = new TeamMemberModel();
-        $user = $userModel->find($id);
+        if (!$this->request->isAJAX()) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Request tidak valid',
+            ])->setStatusCode(400);
+        }
 
+        // Ambil data dari body JSON
+        $data = $this->request->getJSON(true);
+        $id   = $data['user_id'] ?? null;
+        $role = $data['role'] ?? null;
+
+        if (!$id) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'User ID wajib dikirim',
+            ])->setStatusCode(400);
+        }
+
+        $userModel = new UserModel();
+        $teamMemberModel = new TeamMemberModel();
+
+        // Ambil data user
+        $user = $userModel->find($id);
         if (!$user) {
             return $this->response->setJSON([
                 'status' => 'error',
                 'message' => 'User tidak ditemukan',
             ])->setStatusCode(404);
         }
-        // cek jika user sudah admin
-        if ($getTeamByMember->getTeamByMember($id)) {
+
+        // Cek apakah user adalah atlet
+        if ($teamMemberModel->getTeamByMember($id)) {
             return $this->response->setJSON([
                 'status' => 'error',
-                'message' => 'User adalah atlit, tidak bisa dijadikan admin',
+                'message' => 'User adalah atlet, tidak bisa dijadikan admin',
             ])->setStatusCode(400);
         }
+
+        // Toggle role
         if ($user['role'] === 'admin') {
             $userModel->update($id, ['role' => 'member']);
             return $this->response->setJSON([
                 'status' => 'success',
                 'message' => $user['name'] . ' berhasil dijadikan member',
             ]);
+        } else if ($role === 'inspector') {
+            $userModel->update($id, ['role' => 'inspector']);
+            return $this->response->setJSON([
+                'status' => 'success',
+                'message' => $user['name'] . ' berhasil dijadikan pengawas',
+            ]);
         } else {
-
             $userModel->update($id, ['role' => 'admin']);
             return $this->response->setJSON([
                 'status' => 'success',
@@ -103,7 +146,7 @@ class DashboardController extends BaseController
                         'id'    => $mid,
                         'name'  => $mname,
                         'email' => $memail,
-                        'role'  =>  $mrole,// default role
+                        'role'  =>  $mrole, // default role
                     ];
                 }
             }
@@ -131,7 +174,7 @@ class DashboardController extends BaseController
         $data = [
             'users' => $userModel->getEligibleAdmins()
         ];
-    
+
         return view('admin/users', $data);
     }
 

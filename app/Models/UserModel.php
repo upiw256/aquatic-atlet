@@ -14,7 +14,7 @@ class UserModel extends Model
     protected $useTimestamps  = true;
 
     protected $allowedFields = [
-        'id', 'name', 'email', 'password', 'role', 'created_at', 'updated_at'
+        'id', 'name', 'email', 'password', 'role', 'created_at', 'updated_at', 'is_verified', 'verification_token', 'email_verified_at'
     ];
 
     public function getMembersWithTeam()
