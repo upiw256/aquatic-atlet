@@ -68,7 +68,9 @@ class PortfolioController extends BaseController
 
         $user = $userModel->find($userId);
         if (!$user) {
-            return $this->response->setStatusCode(404, 'User tidak ditemukan');
+            return redirect()->to('/inspector/members')
+                ->with('error', 'User tidak ditemukan. Pastikan ID yang dimasukkan benar.')
+                ->withInput();
         }
 
         $biodata     = $biodataModel->getByUserId($userId);          // array assoc (nama, tgl_lahir, alamat, phone, dsb)
@@ -76,7 +78,9 @@ class PortfolioController extends BaseController
         $userbybiodata = $biodataModel->getDataFormUser($userId); // ambil data biodata lengkap dengan user info
         $dataTeam = $team->getTeamByMember($userId); // ambil data tim jika ada
         if (!$biodata) {
-            return $this->response->setStatusCode(404, 'Biodata tidak ditemukan');
+            return redirect()->to('/inspector/members')
+                ->with('error', 'Biodata tidak ditemukan. Beritahukan anggota untuk mengisi biodata terlebih dahulu.')
+                ->withInput();
         }
         // --- Siapkan path foto (pakai file system path agar aman di mPDF) ---
         $fileName   = $biodata['photo'] ?? null; // misal kolom 'photo' simpan nama file
