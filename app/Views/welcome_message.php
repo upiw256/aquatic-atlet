@@ -1,7 +1,7 @@
 <?= $this->extend('layouts/home_layout') ?>
 <?= $this->section('content') ?>
 <h1 class="text-center w-100 mb-4">Tim Polo Air Indonesia</h1>
-<?php if (isset($teams)): ?>
+<?php if ($teams !== null): ?>
     <?php foreach ($teams as $team): ?>
         <a href="<?= base_url('team-detail/' . $team['id']) ?>" class="text-decoration-none">
             <div class="team-item" data-name="<?= strtolower(esc($team['name'])) ?>">
