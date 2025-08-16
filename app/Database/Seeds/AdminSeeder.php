@@ -31,6 +31,7 @@ class AdminSeeder extends Seeder
                 'email'    => $faker->unique()->safeEmail,
                 'password' => password_hash('123456', PASSWORD_DEFAULT),
                 'role'     => 'admin',
+                'is_verified' => true,
             ];
 
             $this->db->table('users')->insert($data);
