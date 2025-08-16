@@ -286,11 +286,11 @@ class PortfolioController extends BaseController
                 ->withInput();
         }
         $dataTeam = $teamModel->getTeamByOwnerId($team['owner_id']);
-        if (!$DataMember) {
-            return redirect()->to('/inspector/teams')
-                ->with('error', 'Data anggota tim tidak ditemukan. Pastikan tim sudah memiliki anggota.')
-                ->withInput();
-        }
+        // if (!$DataMember) {
+        //     return redirect()->to('/inspector/teams')
+        //         ->with('error', 'Data anggota tim tidak ditemukan. Pastikan tim sudah memiliki anggota.')
+        //         ->withInput();
+        // }
         $html = view('inspector/team_pdf', [
             'team'      => $dataTeam,
             'DataMembers' => $DataMember,
