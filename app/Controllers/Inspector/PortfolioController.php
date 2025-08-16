@@ -287,7 +287,9 @@ class PortfolioController extends BaseController
         }
         $dataTeam = $teamModel->getTeamByOwnerId($team['owner_id']);
         if (!$DataMember) {
-            return $this->response->setStatusCode(404, 'Team tidak ditemukan');
+            return redirect()->to('/inspector/teams')
+                ->with('error', 'Data anggota tim tidak ditemukan. Pastikan tim sudah memiliki anggota.')
+                ->withInput();
         }
         $html = view('inspector/team_pdf', [
             'team'      => $dataTeam,
