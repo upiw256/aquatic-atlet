@@ -37,6 +37,9 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->get('email-settings', 'Admin\SettingEmailController::index');
     $routes->post('email-settings/save', 'Admin\SettingEmailController::save');
 
+    // Users
+    $routes->put('users/changePassword/(:segment)', 'Admin\DashboardController::changePassword/$1');
+
     // Teams
     $routes->get('teams/create', 'Admin\TeamController::create');
     $routes->post('teams/store', 'Admin\TeamController::store');
