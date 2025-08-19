@@ -3,15 +3,24 @@
 
 <?php if ($team): ?>
     <div class="card mb-4 shadow-sm">
-        <div class="card-body">
-            <h4 class="card-title d-flex justify-content-between align-items-center">
-                <?= esc($team['name']) ?>
-                <a href="/owner/team/edit/<?= esc($team['id']) ?>" class="btn btn-sm btn-outline-primary">Edit Tim</a>
-            </h4>
-            <p class="card-text"><?= esc($team['description']) ?></p>
-            <p class="text-muted">Jumlah Anggota: <?= count($members) ?></p>
+    <div class="card-body">
+        <div class="row align-items-center">
+            <!-- Bagian Kiri: Deskripsi -->
+            <div class="col-md-8">
+                <p class="card-text"><?= esc($team['description']) ?></p>
+                <p class="text-muted">Jumlah Anggota: <?= count($members) ?></p>
+            </div>
+
+            <!-- Bagian Kanan: Logo -->
+            <div class="col-md-4 text-center">
+                <img src="<?= esc(base_url('/uploads/logo/').$team['logo'] ?? '/assets/default-logo.png') ?>" 
+                     alt="Logo <?= esc($team['name']) ?>" 
+                     class="img-fluid" style="max-height:120px;">
+            </div>
         </div>
     </div>
+</div>
+
 
     <h5>Anggota Tim</h5>
     <table class="table table-bordered">
