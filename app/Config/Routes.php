@@ -96,3 +96,19 @@ $routes->group('member', ['filter' => 'role:member'], function ($routes) {
     $routes->get('reject-invite/(:segment)', 'Member\DashboardController::rejectInvite/$1');
     $routes->get('leave-team', 'Member\DashboardController::leaveTeam');
 });
+
+$routes->group('api', ['filter' => 'bearerAuth'],function ($routes) {
+    $routes->post('auth/login', 'Api\AuthController::login');
+    // $routes->get('auth/login', 'Api\AuthController::login');
+    $routes->post('auth/register', 'Api\AuthController::register');
+    $routes->get('auth/register', 'Api\AuthController::register');
+    $routes->get('auth/verify-email/(:segment)', 'Api\AuthController::verifyEmail/$1');
+    $routes->get('auth/resend-verification', 'Api\AuthController::resendVerificationEmail');
+    
+    // Protected routes
+    $routes->group('', ['filter' => 'auth'], function ($routes) {
+        $routes->get('user/profile', 'Api\UserController::profile');
+        $routes->put('user/profile/update', 'Api\UserController::updateProfile');
+        $routes->post('user/logout', 'Api\AuthController::logout');
+    });
+});
