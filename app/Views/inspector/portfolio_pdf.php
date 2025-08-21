@@ -7,11 +7,11 @@ $age       = $birthDate->diff($today)->y;
 <table class="header-table">
     <tr>
         <td class="logo-cell">
-            <img src="file://<?= FCPATH ?>assets/images/logo-aquatic.png" alt="Logo" class="logo">
+            <img src="file://<?= FCPATH ?>assets/images/logo-polo.png" alt="Logo" class="logo">
         </td>
         <td class="title-cell">
             <h2>LAPORAN DATA ATLET POLO AIR</h2>
-            <div class="sub-title">Tingkat Nasional - <?= date('Y') ?></div>
+            <div class="sub-title">Tingkat Provinsi - <?= date('Y') ?></div>
         </td>
     </tr>
 </table>

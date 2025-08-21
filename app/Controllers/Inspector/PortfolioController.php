@@ -21,7 +21,8 @@ use Endroid\QrCode\Writer\PngWriter;
 
 class PortfolioController extends BaseController
 {
-    function isValidUuid($uuid) {
+    function isValidUuid($uuid)
+    {
         return preg_match(
             '/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i',
             $uuid
@@ -48,7 +49,7 @@ class PortfolioController extends BaseController
             backgroundColor: new Color(255, 255, 255)
         );
         $logo = new Logo(
-            path: FCPATH . 'assets/images/logo-aquatic.png',
+            path: FCPATH . 'assets/images/logo-polo.png',
             resizeToWidth: 130,
             punchoutBackground: false
         );
@@ -239,7 +240,7 @@ class PortfolioController extends BaseController
         }
 
         ';
-        $mpdf->SetWatermarkImage(FCPATH . 'assets/images/logo-aquatic.png', 0.2); // 0.2 = transparansi
+        $mpdf->SetWatermarkImage(FCPATH . 'assets/images/logo-polo.png', 0.2); // 0.2 = transparansi
         $mpdf->showWatermarkImage = true;
         $mpdf->WriteHTML($stylesheet, \Mpdf\HTMLParserMode::HEADER_CSS);
         $mpdf->WriteHTML($html, \Mpdf\HTMLParserMode::HTML_BODY);
@@ -270,7 +271,7 @@ class PortfolioController extends BaseController
             backgroundColor: new Color(255, 255, 255)
         );
         $logo = new Logo(
-            path: FCPATH . 'assets/images/logo-aquatic.png',
+            path: FCPATH . 'assets/images/logo-polo.png',
             resizeToWidth: 130,
             punchoutBackground: false
         );
@@ -440,7 +441,7 @@ class PortfolioController extends BaseController
         }
 
         ';
-        $mpdf->SetWatermarkImage(FCPATH . 'assets/images/logo-aquatic.png', 0.2); // 0.2 = transparansi
+        $mpdf->SetWatermarkImage(FCPATH . 'assets/images/logo-polo.png', 0.2); // 0.2 = transparansi
         $mpdf->showWatermarkImage = true;
         $mpdf->WriteHTML($stylesheet, \Mpdf\HTMLParserMode::HEADER_CSS);
         $mpdf->WriteHTML($html, \Mpdf\HTMLParserMode::HTML_BODY);

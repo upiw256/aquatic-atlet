@@ -1,11 +1,14 @@
 <table class="header-table">
     <tr>
         <td class="logo-cell">
-            <img src="file://<?= FCPATH ?>assets/images/logo-aquatic.png" alt="Logo" class="logo">
+            <img src="file://<?= FCPATH ?>assets/images/logo-polo.png" alt="Logo" class="logo">
         </td>
         <td class="title-cell">
             <h2>LAPORAN DATA TEAM POLO AIR</h2>
-            <div class="sub-title">Tingkat Nasional - <?= date('Y') ?></div>
+            <div class="sub-title">Tingkat Provinsi - <?= date('Y') ?></div>
+        </td>
+        <td class="logo-cell">
+            <img src="file://<?= FCPATH ?>assets/images/logo-aquatic.png" alt="Logo" class="logo">
         </td>
     </tr>
 </table>
@@ -15,7 +18,7 @@
         <td class="label">Nama Team</td>
         <td><?= esc($team['name']) ?></td>
         <td rowspan="10" class="photo">
-            <img src="file://<?= FCPATH .'/uploads/logo/'.$team['logo'] ?>" alt="Foto Atlet" class="thumbnail">
+            <img src="file://<?= FCPATH . '/uploads/logo/' . $team['logo'] ?>" alt="Foto Atlet" class="thumbnail">
         </td>
     </tr>
     <tr>
@@ -47,7 +50,7 @@
                     <td><?= esc($DataMember['name']) ?></td>
                     <td><?= esc($DataMember['email']) ?></td>
                     <td><?= esc($DataMember['role']) ?></td>
-                    <td><img src="file://<?= FCPATH .$DataMember['photo'] ?>" alt="Foto Atlet" style="max-width: 50px;"></td>
+                    <td><img src="file://<?= FCPATH . $DataMember['photo'] ?>" alt="Foto Atlet" style="max-width: 50px;"></td>
                 </tr>
             <?php endforeach; ?>
         <?php else: ?>
