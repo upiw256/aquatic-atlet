@@ -34,7 +34,12 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->put('users/updateRole/', 'Admin\DashboardController::makeAdmin');
     $routes->get('members', 'Admin\DashboardController::members');
     $routes->get('teams', 'Admin\DashboardController::teams');
+    $routes->get('email-settings', 'Admin\SettingEmailController::index');
+    $routes->post('email-settings/save', 'Admin\SettingEmailController::save');
 
+    // Users
+    $routes->put('users/changePassword/(:segment)', 'Admin\DashboardController::changePassword/$1');
+    
     // Teams
     $routes->get('teams/create', 'Admin\TeamController::create');
     $routes->post('teams/store', 'Admin\TeamController::store');
@@ -44,14 +49,14 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->post('teams/update/(:segment)', 'Admin\TeamController::update/$1');
     $routes->delete('teams/delete/(:segment)', 'Admin\TeamController::delete/$1');
     $routes->get('teams/detail/(:segment)', 'Admin\TeamController::detail/$1');
-
+    
     // Achievements
     $routes->get('achivements', 'Admin\AchivementController::index');
     $routes->get('achivement/create', 'Admin\AchivementController::create');
     $routes->post('achivement/save', 'Admin\AchivementController::store');
     $routes->get('achivements/edit/(:segment)', 'Admin\AchivementController::edit/$1');
     $routes->delete('achivements/delete/(:segment)', 'Admin\AchivementController::delete/$1');
-
+    
     // Biodata
     $routes->get('biodata/edit/(:uuid)', 'Admin\BiodataController::edit/$1');
     $routes->post('biodata/save/(:uuid)', 'Admin\BiodataController::save/$1');
@@ -65,7 +70,7 @@ $routes->group('inspector', ['filter' => 'role:inspector'], function ($routes) {
     $routes->get('portfolio/preview/(:segment)', 'Inspector\PortfolioController::preview/$1');
     $routes->get('teams', 'Admin\DashboardController::teams');
     $routes->get('team/(:segment)', 'Inspector\PortfolioController::team/$1');
-    
+    $routes->put('users/changePassword/(:segment)', 'Admin\DashboardController::changePassword/$1');
 });
 
 // Owner Group

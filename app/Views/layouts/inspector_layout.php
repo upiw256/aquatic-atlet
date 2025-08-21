@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="<?= csrf_hash() ?>">
     <base href="<?= base_url() ?>/">
     <title><?= $title ?? 'Inspector Area' ?></title>
     <!-- Styles -->
@@ -63,13 +64,13 @@
                                 <i class="ti ti-atom"></i>
                                 <span class="hide-menu">Team</span>
                             </a>
-                        </li>
+                            <!-- </li>
                         <li class="sidebar-item">
                             <a class="sidebar-link" href="/inspector/achivements" aria-expanded="false">
                                 <i class="ti ti-trophy"></i>
                                 <span class="hide-menu">Penghargaan</span>
                             </a>
-                        </li>
+                        </li> -->
 
                     </ul>
                     <ul class="sidebar-nav mt-4">
@@ -81,6 +82,12 @@
                             <a class="sidebar-link" href="/member/profile" aria-expanded="false">
                                 <i class="ti ti-ad-2"></i>
                                 <span class="hide-menu">Biodata</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="javascript:void(0)" class="sidebar-link" aria-expanded="false" onclick="changePassword(<?= session('id') ?>)">
+                                <i class="ti ti-lock"></i>
+                                <span class="hide-menu">Ubah Password</span>
                             </a>
                         </li>
                         <li class="sidebar-item">
@@ -248,6 +255,111 @@
                 }
             }
         });
+
+        function changePassword(userId) {
+            Swal.fire({
+                title: 'Ganti Password',
+                html: `
+                <div class="swal2-input-group" style="position:relative">
+                    <input id="old-password" type="password" class="swal2-input" placeholder="Masukkan password lama">
+                    <i id="toggle-old" class="ti ti-eye" 
+                    style="position:absolute; right:15px; top:18px; cursor:pointer;"></i>
+                </div>
+                <div class="swal2-input-group" style="position:relative">
+                    <input id="new-password" type="password" class="swal2-input" placeholder="Masukkan password baru">
+                    <i id="toggle-new" class="ti ti-eye" 
+                    style="position:absolute; right:15px; top:18px; cursor:pointer;"></i>
+                </div>
+                <div class="swal2-input-group" style="position:relative">
+                    <input id="confirm-password" type="password" class="swal2-input" placeholder="Konfirmasi password baru">
+                    <i id="toggle-confirm" class="ti ti-eye" 
+                    style="position:absolute; right:15px; top:18px; cursor:pointer;"></i>
+                </div>
+            `,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: 'Simpan',
+                cancelButtonText: 'Batal',
+                didOpen: () => {
+                    const togglePassword = (inputId, toggleId) => {
+                        const input = document.getElementById(inputId);
+                        const toggle = document.getElementById(toggleId);
+
+                        toggle.addEventListener('click', () => {
+                            if (input.type === "password") {
+                                input.type = "text";
+                                toggle.classList.remove("ti-eye");
+                                toggle.classList.add("ti-eye-off");
+                            } else {
+                                input.type = "password";
+                                toggle.classList.remove("ti-eye-off");
+                                toggle.classList.add("ti-eye");
+                            }
+                        });
+                    };
+
+                    togglePassword("old-password", "toggle-old");
+                    togglePassword("new-password", "toggle-new");
+                    togglePassword("confirm-password", "toggle-confirm");
+                },
+                preConfirm: () => {
+                    const oldPassword = document.getElementById('old-password').value;
+                    const newPassword = document.getElementById('new-password').value;
+                    const confirmPassword = document.getElementById('confirm-password').value;
+
+                    if (!oldPassword || !newPassword || !confirmPassword) {
+                        Swal.showValidationMessage('Semua field wajib diisi');
+                        return false;
+                    }
+
+                    if (newPassword !== confirmPassword) {
+                        Swal.showValidationMessage('Konfirmasi password tidak cocok');
+                        return false;
+                    }
+
+                    return {
+                        oldPassword,
+                        newPassword
+                    };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                    fetch(`/admin/users/changePassword/${userId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': csrfToken
+                            },
+                            body: JSON.stringify({
+                                old_password: result.value.oldPassword,
+                                new_password: result.value.newPassword
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success') {
+                                Swal.fire({
+                                    title: 'Berhasil!',
+                                    text: 'Password berhasil diganti',
+                                    icon: 'success'
+                                }).then(() => {
+                                    // Refresh setelah sukses
+                                    window.location.reload();
+                                });
+                            } else {
+                                Swal.fire('Error', data.message, 'error');
+                            }
+                        })
+                        .catch(err => {
+                            Swal.fire('Error', 'Terjadi kesalahan saat menghubungi server.', 'error');
+                        });
+                } else if (result.dismiss === Swal.DismissReason.cancel) {
+                    // Refresh jika user klik Batal
+                    window.location.reload();
+                }
+            });
+        }
     </script>
 </body>
 

@@ -4,11 +4,12 @@ namespace App\Controllers\Admin;
 
 use App\Controllers\BaseController;
 use App\Models\BiodataModel;
+use App\Models\EmailSettingsModel;
 use CodeIgniter\HTTP\ResponseInterface;
 use App\Models\UserModel;
 use App\Models\TeamModel;
 use App\Models\TeamMemberModel;
-
+use Config\Email;
 
 class DashboardController extends BaseController
 {
@@ -17,11 +18,16 @@ class DashboardController extends BaseController
         $userModel = new UserModel();
         $teamModel = new TeamModel();
         $biodata = new BiodataModel();
+        $settings = new EmailSettingsModel();
         // Cek apakah sudah isi biodata
         $userId = session('user_id');
         $biodata = $biodata->where('user_id', $userId)->first();
+        $setting = $settings->findAll();
         if (!$biodata) {
             return redirect()->to('/member/profile')->with('warning', 'Anda harus mengisi biodata terlebih dahulu sebelum mengakses dashboard.');
+        }
+        if (!$setting) {
+            return redirect()->to('/admin/email-settings')->with('warning', 'Anda harus mengisi Setting Email terlebih dahulu sebelum mengakses dashboard.');
         }
         $memberCount = $userModel->where('role', 'member')->countAllResults();
         $teamCount   = $teamModel->countAllResults();
@@ -215,5 +221,46 @@ class DashboardController extends BaseController
             ->findAll();
 
         return $this->response->setJSON($users);
+    }
+    public function changePassword($id)
+    {
+        $userModel = new UserModel();
+        $user = $userModel->find($id);
+
+        if (!$user) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'User tidak ditemukan',
+            ])->setStatusCode(404);
+        }
+
+    // Ambil data dari body JSON
+        $data = $this->request->getJSON(true);
+        $oldPassword = $data['old_password'] ?? null;
+        $newPassword = $data['new_password'] ?? null;
+
+        if (!$oldPassword || !$newPassword) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Semua field wajib diisi',
+            ])->setStatusCode(400);
+        }
+
+        // Cek password lama
+        if (!password_verify($oldPassword, $user['password'])) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Password lama salah',
+            ])->setStatusCode(400);
+        }
+
+        // Update password baru
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+        $userModel->update($id, ['password' => $hashedPassword]);
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'Password berhasil diganti',
+        ]);
     }
 }

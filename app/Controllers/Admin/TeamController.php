@@ -122,7 +122,7 @@ class TeamController extends BaseController
         $logoName = null;
         if ($logoFile && $logoFile->isValid() && !$logoFile->hasMoved()) {
             $logoName = $logoFile->getRandomName();
-            $logoFile->move(ROOTPATH . 'public/uploads/logo/', $logoName);
+            $logoFile->move(FCPATH . 'uploads/logo/', $logoName);
         }
 
         $teamModel = new TeamModel();
