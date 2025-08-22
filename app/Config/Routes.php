@@ -60,6 +60,13 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     // Biodata
     $routes->get('biodata/edit/(:uuid)', 'Admin\BiodataController::edit/$1');
     $routes->post('biodata/save/(:uuid)', 'Admin\BiodataController::save/$1');
+
+    // competitions
+    $routes->get('competitions', 'Admin\CompetitionController::index');
+    $routes->get('competition/create', 'Admin\CompetitionController::create');
+    $routes->post('competition/save', 'Admin\CompetitionController::store');
+    $routes->get('competitions/edit/(:segment)', 'Admin\CompetitionController::edit/$1');
+    $routes->delete('competitions/delete/(:segment)', 'Admin\CompetitionController::delete/$1');
 });
 
 // Inspector Group

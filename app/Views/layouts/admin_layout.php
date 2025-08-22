@@ -72,6 +72,12 @@
                             </a>
                         </li>
                         <li class="sidebar-item">
+                            <a class="sidebar-link" href="/admin/competitions" aria-expanded="false">
+                                <i class="ti ti-atom"></i>
+                                <span class="hide-menu">Kompetisi</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
                             <a class="sidebar-link" href="/admin/users" aria-expanded="false">
                                 <i class="ti ti-users"></i>
                                 <span class="hide-menu">User Management</span>
