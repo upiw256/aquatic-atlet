@@ -34,7 +34,9 @@ class Filters extends BaseFilters
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
-        'role'        => \App\Filters\RoleFilter::class,
+        'role'          => \App\Filters\RoleFilter::class,
+        'api'           => \App\Filters\ApiAuthFilter::class,
+        'bearerAuth'    => \App\Filters\BearerAuth::class,
     ];
 
     /**
@@ -54,6 +56,7 @@ class Filters extends BaseFilters
         'before' => [
             'forcehttps', // Force Global Secure Requests
             'pagecache',  // Web Page Caching
+            
         ],
         'after' => [
             'pagecache',   // Web Page Caching
@@ -71,7 +74,11 @@ class Filters extends BaseFilters
     public array $globals = [
         'before' => [
             // 'honeypot',
-            // 'csrf',
+            'csrf' => [
+                'except' => [
+                    'api/*',
+                ]
+            ],
             // 'invalidchars',
         ],
         'after' => [

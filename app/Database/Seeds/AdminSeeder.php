@@ -11,20 +11,6 @@ class AdminSeeder extends Seeder
     public function run()
     {
         $faker = Factory::create('id_ID');
-        $uuid = Uuid::uuid4()->toString();
-
-        // $data = [
-        //     'id'       => $uuid,
-        //     'name'     => 'Super Admin',
-        //     'email'    => 'bilqimlb@gmail.com',
-        //     'password' => password_hash('5414450', PASSWORD_DEFAULT),
-        //     'role'     => 'admin',
-        // ];
-
-        // $this->db->table('users')->insert($data);
-
-
-
             $data = [
                 'id'       => Uuid::uuid4()->toString(),
                 'name'     => $faker->name,

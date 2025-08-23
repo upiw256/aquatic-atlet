@@ -53,6 +53,8 @@
                             <?php elseif ($user['role'] === 'owner'): ?>
                                 <!-- Tidak tampilkan tombol apapun -->
                             <?php endif; ?>
+                        <?php else: ?>
+                            <button class="btn btn-sm btn-secondary" onclick="changePassword('<?= $user['id'] ?>')">Ganti Password</button>
                         <?php endif; ?>
 
                     </td>
@@ -103,6 +105,110 @@
                         console.error(err);
                         Swal.fire('Error', `Terjadi kesalahan saat menghubungi server. ${err}`, 'error');
                     });
+            }
+        });
+    }
+
+    function changePassword(userId) {
+        Swal.fire({
+            title: 'Ganti Password',
+            html: `
+        <div class="swal2-input-group" style="position:relative">
+            <input id="old-password" type="password" class="swal2-input" placeholder="Masukkan password lama">
+            <i id="toggle-old" class="ti ti-eye" 
+               style="position:absolute; right:15px; top:18px; cursor:pointer;"></i>
+        </div>
+        <div class="swal2-input-group" style="position:relative">
+            <input id="new-password" type="password" class="swal2-input" placeholder="Masukkan password baru">
+            <i id="toggle-new" class="ti ti-eye" 
+               style="position:absolute; right:15px; top:18px; cursor:pointer;"></i>
+        </div>
+        <div class="swal2-input-group" style="position:relative">
+            <input id="confirm-password" type="password" class="swal2-input" placeholder="Konfirmasi password baru">
+            <i id="toggle-confirm" class="ti ti-eye" 
+               style="position:absolute; right:15px; top:18px; cursor:pointer;"></i>
+        </div>
+    `,
+            focusConfirm: false,
+            showCancelButton: true,
+            confirmButtonText: 'Simpan',
+            cancelButtonText: 'Batal',
+            didOpen: () => {
+                const togglePassword = (inputId, toggleId) => {
+                    const input = document.getElementById(inputId);
+                    const toggle = document.getElementById(toggleId);
+
+                    toggle.addEventListener('click', () => {
+                        if (input.type === "password") {
+                            input.type = "text";
+                            toggle.classList.remove("ti-eye");
+                            toggle.classList.add("ti-eye-off");
+                        } else {
+                            input.type = "password";
+                            toggle.classList.remove("ti-eye-off");
+                            toggle.classList.add("ti-eye");
+                        }
+                    });
+                };
+
+                togglePassword("old-password", "toggle-old");
+                togglePassword("new-password", "toggle-new");
+                togglePassword("confirm-password", "toggle-confirm");
+            },
+            preConfirm: () => {
+                const oldPassword = document.getElementById('old-password').value;
+                const newPassword = document.getElementById('new-password').value;
+                const confirmPassword = document.getElementById('confirm-password').value;
+
+                if (!oldPassword || !newPassword || !confirmPassword) {
+                    Swal.showValidationMessage('Semua field wajib diisi');
+                    return false;
+                }
+
+                if (newPassword !== confirmPassword) {
+                    Swal.showValidationMessage('Konfirmasi password tidak cocok');
+                    return false;
+                }
+
+                return {
+                    oldPassword,
+                    newPassword
+                };
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch(`/admin/users/changePassword/${userId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '<?= csrf_hash() ?>'
+                        },
+                        body: JSON.stringify({
+                            old_password: result.value.oldPassword,
+                            new_password: result.value.newPassword
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            Swal.fire({
+                                title: 'Berhasil!',
+                                text: 'Password berhasil diganti',
+                                icon: 'success'
+                            }).then(() => {
+                                // Refresh setelah sukses
+                                window.location.reload();
+                            });
+                        } else {
+                            Swal.fire('Error', data.message, 'error');
+                        }
+                    })
+                    .catch(err => {
+                        Swal.fire('Error', 'Terjadi kesalahan saat menghubungi server.', 'error');
+                    });
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                // Refresh jika user klik Batal
+                window.location.reload();
             }
         });
     }

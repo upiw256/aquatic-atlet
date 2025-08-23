@@ -222,4 +222,45 @@ class DashboardController extends BaseController
 
         return $this->response->setJSON($users);
     }
+    public function changePassword($id)
+    {
+        $userModel = new UserModel();
+        $user = $userModel->find($id);
+
+        if (!$user) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'User tidak ditemukan',
+            ])->setStatusCode(404);
+        }
+
+    // Ambil data dari body JSON
+        $data = $this->request->getJSON(true);
+        $oldPassword = $data['old_password'] ?? null;
+        $newPassword = $data['new_password'] ?? null;
+
+        if (!$oldPassword || !$newPassword) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Semua field wajib diisi',
+            ])->setStatusCode(400);
+        }
+
+        // Cek password lama
+        if (!password_verify($oldPassword, $user['password'])) {
+            return $this->response->setJSON([
+                'status' => 'error',
+                'message' => 'Password lama salah',
+            ])->setStatusCode(400);
+        }
+
+        // Update password baru
+        $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+        $userModel->update($id, ['password' => $hashedPassword]);
+
+        return $this->response->setJSON([
+            'status' => 'success',
+            'message' => 'Password berhasil diganti',
+        ]);
+    }
 }
