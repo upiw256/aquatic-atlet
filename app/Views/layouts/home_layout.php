@@ -6,13 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <base href="<?= base_url() ?>/">
     <title><?= $title . " - Akuatik Indonesia" ?? 'Member Area' ?></title>
-    <link rel="shortcut icon" type="image/png" href="/assets/images/logo-aquatic.png" />
+    <link rel="shortcut icon" type="image/png" href="/assets/images/logo-polo.png" />
     <link rel="stylesheet" href="/assets/css/styles.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
     <style>
-        html, body {
+        html,
+        body {
             height: 100%;
             margin: 0;
         }
@@ -23,8 +24,10 @@
         }
 
         main {
-            flex: 1; /* Isi ruang di antara header dan footer */
+            flex: 1;
+            /* Isi ruang di antara header dan footer */
         }
+
         /* Header Background Image */
         .header-bg {
             background-image: url('https://akuatikindonesia.id/images/menu-background.jpg');
@@ -112,9 +115,11 @@
             position: relative;
             overflow: hidden;
         }
+
         .role-overlay {
             position: absolute;
-            top: -20px; /* semakin negatif, semakin tinggi */
+            top: -20px;
+            /* semakin negatif, semakin tinggi */
             left: 0;
             right: 0;
             font-size: 12px;
@@ -126,11 +131,14 @@
             z-index: 10;
             border-radius: 5px;
         }
+
         .team-wrapper {
             position: relative;
-            display: inline-block; /* biar lebarnya mengikuti isi */
+            display: inline-block;
+            /* biar lebarnya mengikuti isi */
             margin: 15px;
         }
+
         .team-photo {
             width: 100%;
             height: 100%;
@@ -160,11 +168,12 @@
         }
 
         .team-item.special {
-            background: linear-gradient(
-                to bottom,
-                oklch(20% 0.1 270), /* setara biru tua */
-                oklch(65% 0.25 25)  /* setara merah terang */
-            );
+            background: linear-gradient(to bottom,
+                    oklch(20% 0.1 270),
+                    /* setara biru tua */
+                    oklch(65% 0.25 25)
+                    /* setara merah terang */
+                );
             color: white;
         }
 
@@ -185,7 +194,7 @@
     <!-- Header with Logo -->
     <div class="header-bg">
         <a class="navbar-brand" href="#">
-            <img src="/assets/images/logo-aquatic.png" alt="Akuatik Indonesia Logo">
+            <img src="/assets/images/logo-polo.png" alt="Akuatik Indonesia Logo">
         </a>
     </div>
 
@@ -246,36 +255,37 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <?php if (session()->getFlashdata('success')): ?>
-    <script>
-        Swal.fire({
-            icon: 'success',
-            title: 'Welcome!',
-            text: '<?= session()->getFlashdata('success') ?>',
-        });
-    </script>
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Welcome!',
+                text: '<?= session()->getFlashdata('success') ?>',
+            });
+        </script>
     <?php endif; ?>
     <?php if (session()->getFlashdata('error')): ?>
-    <script>
-        Swal.fire({
-            icon: 'error',
-            title: 'Error!',
-            text: '<?= session()->getFlashdata('error') ?>',
-        });
-    </script>
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: '<?= session()->getFlashdata('error') ?>',
+            });
+        </script>
     <?php endif; ?>
 
     <!-- Script untuk pencarian -->
     <script>
         let shownAlertOnce = false;
+
         function cariTeam() {
             const input = document.getElementById('searchInput').value.toLowerCase();
             const teamItems = document.querySelectorAll('.team-item');
             const noResults = document.getElementById('noResults');
             if (!input || !teamItems.length) {
-                    if (!shownAlertOnce) {
-                        alert("Pencarian hanya bisa dilakukan di halaman utama.");
-                        shownAlertOnce = true; // agar tidak ditampilkan lagi
-                    }
+                if (!shownAlertOnce) {
+                    alert("Pencarian hanya bisa dilakukan di halaman utama.");
+                    shownAlertOnce = true; // agar tidak ditampilkan lagi
+                }
                 return;
             }
 

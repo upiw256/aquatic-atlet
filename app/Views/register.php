@@ -10,7 +10,7 @@
           <div class="card mb-0">
             <div class="card-body">
               <a href="./index.html" class="text-nowrap logo-img text-center d-block py-3 w-100">
-                <img src="../assets/images/logo-aquatic.png" width="180" alt="">
+                <img src="../assets/images/logo-polo.png" width="180" alt="">
               </a>
               <p class="text-center">Pendataan atlet Polo Air Indonesia</p>
               <form action="<?= site_url('/register') ?>" method="post">

@@ -12,7 +12,7 @@
     <!-- Or for RTL support -->
 
     <!-- Scripts -->
-    <link rel="shortcut icon" type="image/png" href="../assets/images/logo-aquatic.png" />
+    <link rel="shortcut icon" type="image/png" href="../assets/images/logo-polo.png" />
     <link rel="stylesheet" href="../assets/css/styles.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js "></script>
@@ -33,7 +33,7 @@
             <div>
                 <div class="brand-logo d-flex align-items-center justify-content-between">
                     <a href="/member/dashboard" class="text-nowrap logo-img">
-                        <img src="../assets/images/logo-aquatic.png" width="50" alt="" />
+                        <img src="../assets/images/logo-polo.png" width="50" alt="" />
                         <span class="logo-name text-truncate"> Dashboard Pengawas</span>
                     </a>
                     <div class="close-btn d-xl-none d-block sidebartoggler cursor-pointer" id="sidebarCollapse">
