@@ -7,6 +7,8 @@ use CodeIgniter\Validation\StrictRules\CreditCardRules;
 use CodeIgniter\Validation\StrictRules\FileRules;
 use CodeIgniter\Validation\StrictRules\FormatRules;
 use CodeIgniter\Validation\StrictRules\Rules;
+use App\Validation\CustomRules;
+use PHPUnit\Event\Event;
 
 class Validation extends BaseConfig
 {
@@ -25,6 +27,7 @@ class Validation extends BaseConfig
         FormatRules::class,
         FileRules::class,
         CreditCardRules::class,
+        CustomRules::class,
     ];
 
     /**
@@ -41,4 +44,30 @@ class Validation extends BaseConfig
     // --------------------------------------------------------------------
     // Rules
     // --------------------------------------------------------------------
+    /**
+     * The list of rules that are used by default.
+     *
+     * @var array<string, string|array>
+     */
+    public $event = [
+        'start_date' => [
+            'rules'  => 'required|valid_date[Y-m-d]',
+            'errors' => [
+                'required'   => 'Tanggal mulai wajib diisi.',
+                'valid_date' => 'Format tanggal mulai salah.',
+            ]
+        ],
+        'end_date' => [
+            'rules'  => 'required|valid_date[Y-m-d]|check_end_date[start_date]',
+            'errors' => [
+                'check_end_date' => 'Tanggal selesai harus setelah tanggal mulai.',
+            ]
+        ],
+        'registration_deadline' => [
+            'rules'  => 'required|valid_date[Y-m-d]|check_registration_deadline[start_date]',
+            'errors' => [
+                'check_registration_deadline' => 'Batas pendaftaran harus sebelum tanggal mulai.',
+            ]
+        ],
+    ];
 }

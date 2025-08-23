@@ -39,7 +39,7 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
 
     // Users
     $routes->put('users/changePassword/(:segment)', 'Admin\DashboardController::changePassword/$1');
-    
+
     // Teams
     $routes->get('teams/create', 'Admin\TeamController::create');
     $routes->post('teams/store', 'Admin\TeamController::store');
@@ -49,22 +49,22 @@ $routes->group('admin', ['filter' => 'role:admin'], function ($routes) {
     $routes->post('teams/update/(:segment)', 'Admin\TeamController::update/$1');
     $routes->delete('teams/delete/(:segment)', 'Admin\TeamController::delete/$1');
     $routes->get('teams/detail/(:segment)', 'Admin\TeamController::detail/$1');
-    
+
     // Achievements
     $routes->get('achivements', 'Admin\AchivementController::index');
     $routes->get('achivement/create', 'Admin\AchivementController::create');
     $routes->post('achivement/save', 'Admin\AchivementController::store');
     $routes->get('achivements/edit/(:segment)', 'Admin\AchivementController::edit/$1');
     $routes->delete('achivements/delete/(:segment)', 'Admin\AchivementController::delete/$1');
-    
+
     // Biodata
     $routes->get('biodata/edit/(:uuid)', 'Admin\BiodataController::edit/$1');
     $routes->post('biodata/save/(:uuid)', 'Admin\BiodataController::save/$1');
 
     // competitions
     $routes->get('competitions', 'Admin\CompetitionController::index');
-    $routes->get('competition/create', 'Admin\CompetitionController::create');
-    $routes->post('competition/save', 'Admin\CompetitionController::store');
+    $routes->get('competitions/create', 'Admin\CompetitionController::create');
+    $routes->post('competitions/store', 'Admin\CompetitionController::store');
     $routes->get('competitions/edit/(:segment)', 'Admin\CompetitionController::edit/$1');
     $routes->delete('competitions/delete/(:segment)', 'Admin\CompetitionController::delete/$1');
 });
@@ -104,7 +104,7 @@ $routes->group('member', ['filter' => 'role:member'], function ($routes) {
     $routes->get('leave-team', 'Member\DashboardController::leaveTeam');
 });
 
-$routes->group('api', ['filter' => 'bearerAuth'],function ($routes) {
+$routes->group('api', ['filter' => 'bearerAuth'], function ($routes) {
     $routes->post('auth/login', 'Api\AuthController::login');
     $routes->post('auth/register', 'Api\AuthController::register');
     $routes->get('auth/register', 'Api\AuthController::register');
