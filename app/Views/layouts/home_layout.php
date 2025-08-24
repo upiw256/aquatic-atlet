@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <base href="<?= base_url() ?>/">
     <title><?= $title . " - Akuatik Indonesia" ?? 'Member Area' ?></title>
-    <link rel="shortcut icon" type="image/png" href="/assets/images/logo-polo.png" />
+    <link rel="shortcut icon" type="image/png" href="<?= base_url() ?>/assets/images/logo-polo.png" />
     <link rel="stylesheet" href="/assets/css/styles.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
@@ -194,7 +194,7 @@
     <!-- Header with Logo -->
     <div class="header-bg">
         <a class="navbar-brand" href="#">
-            <img src="/assets/images/logo-polo.png" alt="Akuatik Indonesia Logo">
+            <img src="<?= base_url() ?>/assets/images/logo-polo.png" alt="Akuatik Indonesia Logo">
         </a>
     </div>
 
