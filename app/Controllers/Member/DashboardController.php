@@ -119,7 +119,10 @@ class DashboardController extends BaseController
         }
 
         // Update status undangan menjadi rejected
-        $teamMemberModel->update($teamMemberId, ['status' => 'rejected']);
+        $teamMemberModel->delete($teamMemberId);
+        $userModel = new UserModel();
+        // Update role user menjadi 'member' jika sebelumnya atlet
+        $userModel->update($userId, ['role' => 'member']);
 
         return redirect()->to('/member/dashboard')->with('success', 'Undangan berhasil ditolak.');
     }

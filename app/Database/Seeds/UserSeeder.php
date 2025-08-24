@@ -13,13 +13,14 @@ class UserSeeder extends Seeder
 
         // User random (50 data)
         for ($i = 0; $i < 50; $i++) {
-            $roles = ['member', 'admin', 'owner'];
+            $roles = ['member', 'inspector'];
             $data = [
                 'id'       => Uuid::uuid4()->toString(),
                 'name'     => $faker->name,
                 'email'    => $faker->unique()->safeEmail,
                 'password' => password_hash('123456', PASSWORD_DEFAULT),
-                'role'     => 'member', // Set default role to member
+                'role'     => $roles[array_rand($roles)], // Set default role to member
+                'is_verified' => true,
             ];
 
             $this->db->table('users')->insert($data);

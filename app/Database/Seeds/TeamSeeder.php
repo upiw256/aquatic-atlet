@@ -13,7 +13,7 @@ class TeamSeeder extends Seeder
                 $faker = Factory::create('id_ID');
 
         // User random (50 data)
-        for ($i = 0; $i < 50; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             $prefixes = ['Ocean', 'Aqua', 'Fire', 'Thunder', 'Ice', 'Storm', 'Wave', 'Shadow'];
             $suffixes = ['Titans', 'Blasters', 'Squad', 'Warriors', 'Force', 'Vortex', 'Guardians'];
 

@@ -27,12 +27,17 @@ class LoginController extends BaseController
         if (! $isVerified && $user['email_verified_at'] === null) {
             return redirect()->back()->withInput()->with('error', 'Akun Anda belum aktif. Silakan cek email untuk verifikasi.');
         }
+        if ($user['role']=== 'atlet') {
+            $role = 'member'; // Ganti role atlet menjadi member
+        }else {
+            $role = $user['role'];
+        }
 
         session()->set([
             'user_id'   => $user['id'],
             'name'      => $user['name'],
             'email'     => $user['email'],
-            'role'      => $user['role'],
+            'role'      => $role,
             'logged_in' => true,
         ]);
 

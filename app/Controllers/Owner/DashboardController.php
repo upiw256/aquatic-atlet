@@ -23,7 +23,7 @@ class DashboardController extends BaseController
         // cek apakah sudah isi biodata jika belum redirect ke biodata
         $biodata = $biodataModel->where('user_id', $userId)->first();
         if (!$biodata) {
-            return redirect()->to('/owner/profile')->with('warning', 'Anda harus mengisi biodata terlebih dahulu sebelum mengakses dashboard.');
+            return redirect()->to('/member/profile')->with('warning', 'Anda harus mengisi biodata terlebih dahulu sebelum mengakses dashboard.');
         }
 
         $team = $teamModel->getTeamByOwnerId($userId);
@@ -68,6 +68,9 @@ class DashboardController extends BaseController
             'role'      => 'atlet',
             'status'    => 'pending',
         ]);
+        // Update role user menjadi 'atlet'
+        $userModel = new UserModel();
+        $userModel->update($memberId, ['role' => 'atlet']);
 
         return redirect()->to('/owner/dashboard')->with('success', 'Anggota berhasil ditambahkan.');
     }

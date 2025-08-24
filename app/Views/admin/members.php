@@ -21,14 +21,21 @@
                     <td class="email"><?= esc($member['email']) ?></td>
                     <td><?= esc($member['role']) ?> <?= esc($member['team']['name'] ?? $member['team_name']) ?></td>
                     <td>
-                        <?php if (session()->get('role') === 'inspector'): ?>
+                        <?php if (trim(strtolower(session()->get('role'))) === 'inspector'): ?>
+                            <!-- User yang login adalah inspector -->
                             <?php if (session()->get('user_id') === $member['id'] || $member['role'] === 'owner' || $member['team'] === null): ?>
                                 <span class="text-muted">-</span>
                             <?php else: ?>
-                                <a href="/inspector/portfolio/<?= $member['id'] ?>" class="btn btn-sm btn-primary"><i class="ti ti-printer"></i> Print</a>
+                                <a href="/inspector/portfolio/<?= $member['id'] ?>" class="btn btn-sm btn-primary">
+                                    <i class="ti ti-printer"></i> Print
+                                </a>
                             <?php endif; ?>
                         <?php else: ?>
-                            <?php if ($member['team'] === null && strtolower(trim($member['role'])) !== 'owner'): ?>
+                            <!-- User yang login adalah admin -->
+                            <?php
+                            $memberRole = strtolower(trim($member['role']));
+                            if ($member['team'] === null && !in_array($memberRole, ['admin', 'owner', 'inspector'])):
+                            ?>
                                 <a href="/admin/assign-owner/<?= $member['id'] ?>" class="btn btn-sm btn-warning">Jadikan Owner</a>
                             <?php else: ?>
                                 <span class="text-muted">-</span>
