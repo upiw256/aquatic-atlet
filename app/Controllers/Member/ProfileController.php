@@ -7,9 +7,27 @@ use App\Models\BiodataModel;
 use App\Models\UserModel;
 use Ramsey\Uuid\Uuid;
 use Config\Services;
+use Aws\S3\S3Client;
 
 class ProfileController extends BaseController
 {
+    protected $s3;
+
+    public function __construct()
+    {
+        $this->s3 = new S3Client([
+            'version'                 => 'latest',
+            'region'                  => getenv('R2_REGION') ?: 'auto',
+            'endpoint'                => getenv('R2_ENDPOINT'), // HARUS R2, BUKAN CDN
+            'use_path_style_endpoint' => true,
+            'signature_version'       => 'v4',
+            'credentials'             => [
+                'key'    => getenv('R2_KEY'),
+                'secret' => getenv('R2_SECRET'),
+            ],
+        ]);
+    }
+
     public function index()
     {
         $userModel = new UserModel();
@@ -17,6 +35,7 @@ class ProfileController extends BaseController
         $userId = session('user_id');
         $biodataModel = new BiodataModel();
         $biodata = $biodataModel->where('user_id', $userId)->first();
+        
 
         return view('member/biodata_form', [
             'user'    => $user,
@@ -27,11 +46,11 @@ class ProfileController extends BaseController
 
     public function save()
     {
-        $userId = session('user_id');
-        $biodataModel = new BiodataModel();
-        $userModel = new UserModel();
-
+        $userId        = session('user_id');
+        $biodataModel  = new BiodataModel();
+        $userModel     = new UserModel();
         $uploadedPhoto = $this->request->getFile('photo');
+
 
         $biodataData = [
             'user_id'        => $userId,
@@ -44,53 +63,46 @@ class ProfileController extends BaseController
             'education'      => $this->request->getPost('education'),
             'occupation'     => $this->request->getPost('occupation'),
             'address'        => $this->request->getPost('address'),
-            'phone'          => $this->request->getPost('phone')
+            'phone'          => $this->request->getPost('phone'),
         ];
 
+        // === Upload photo ke R2 ===
         if ($uploadedPhoto && $uploadedPhoto->isValid() && !$uploadedPhoto->hasMoved()) {
-            $extension = $uploadedPhoto->getExtension() ?: $uploadedPhoto->guessExtension();
-            $photoFileName = 'Profil_' . $userId . '.' . $extension;
-            $targetPath = FCPATH . 'uploads/photos/' . $photoFileName;
-    
-            // Hapus foto lama jika ekstensi berbeda
-            $oldPhoto = $this->request->getPost('old_photo');
-            if ($oldPhoto && file_exists(FCPATH . $oldPhoto)) {
-                $oldExtension = pathinfo($oldPhoto, PATHINFO_EXTENSION);
-                if (strtolower($oldExtension) !== strtolower($extension)) {
-                    unlink(FCPATH . $oldPhoto);
-                }
+            helper('R2_helper');
+            try {
+                $url = uploadToR2($uploadedPhoto, $userId);
+                $biodataData['photo'] = $url;
+            } catch (\Exception $e) {
+                return redirect()->back()->with('error', $e->getMessage());
             }
-    
-            // PROSES RESIZE DULU SEBELUM MOVE
-            \Config\Services::image()
-                ->withFile($uploadedPhoto) // Gunakan objek file langsung
-                ->fit(300, 300, 'center')
-                ->save($targetPath);
-    
-            // Update path di database
-            $biodataData['photo'] = 'uploads/photos/' . $photoFileName;
-    
-            // Pindahkan file asli (jika ingin menyimpan versi original)
-            // $uploadedPhoto->move(FCPATH . 'uploads/photos/original/', $photoFileName); // Opsional
-    
         } else {
+            // Tidak ada foto baru, pakai foto lama
             $biodataData['photo'] = $this->request->getPost('old_photo');
         }
 
-        // Simpan biodata
-        $existingBiodata = $biodataModel->where('user_id', $userId)->first();
-        if ($existingBiodata) {
-            $biodataModel->update($existingBiodata['id'], $biodataData);
-            $message = "Biodata berhasil diperbarui.";
-        } else {
-            $biodataData['id'] = Uuid::uuid4()->toString();
-            $biodataModel->insert($biodataData);
-            $message = "Biodata berhasil disimpan.";
+        // === Simpan ke database ===
+        try {
+
+            $existingBiodata = $biodataModel->where('user_id', $userId)->first();
+            if ($existingBiodata) {
+                $biodataModel->update($existingBiodata['id'], $biodataData);
+                $message = "Biodata berhasil diperbarui.";
+            } else {
+                $biodataData['id'] = Uuid::uuid4()->toString();
+                $biodataModel->insert($biodataData);
+                $message = "Biodata berhasil disimpan.";
+            }
+
+            $userModel->update($userId, [
+                'name'       => $this->request->getPost('fullname'),
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+
+            return redirect()->back()->with('success', $message);
+        } catch (\Exception $e) {
+            log_message('error', 'DB error: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat menyimpan data.');
         }
-
-        // Update nama user
-        $userModel->update($userId, ['name' => $this->request->getPost('fullname')]);
-
-        return redirect()->back()->with('success', $message);
     }
+
 }

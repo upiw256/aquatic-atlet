@@ -50,28 +50,28 @@
     <label for="education" class="form-label">Pendidikan Terakhir</label>
     <input type="text" class="form-control" id="education" name="education"
         value="<?= old('education', $biodata['education'] ?? '') ?>" required>
-    </div>
-    
-    <div class="mb-3">
-        <label for="occupation" class="form-label">Pekerjaan</label>
-        <input type="text" class="form-control" id="occupation" name="occupation"
+</div>
+
+<div class="mb-3">
+    <label for="occupation" class="form-label">Pekerjaan</label>
+    <input type="text" class="form-control" id="occupation" name="occupation"
         value="<?= old('occupation', $biodata['occupation'] ?? '') ?>" required>
-    </div>
-    
-    <div class="mb-3">
-        <label for="address" class="form-label">Alamat</label>
-        <textarea class="form-control" id="address" name="address" required><?= old('address', $biodata['address'] ?? '') ?></textarea>
-    </div>
-    
-    <div class="mb-3">
-        <label for="phone" class="form-label">No. HP</label>
-        <input type="text" class="form-control" id="phone" name="phone"
+</div>
+
+<div class="mb-3">
+    <label for="address" class="form-label">Alamat</label>
+    <textarea class="form-control" id="address" name="address" required><?= old('address', $biodata['address'] ?? '') ?></textarea>
+</div>
+
+<div class="mb-3">
+    <label for="phone" class="form-label">No. HP</label>
+    <input type="text" class="form-control" id="phone" name="phone"
         value="<?= old('phone', $biodata['phone'] ?? '') ?>" required>
 </div>
 
 <div class="mb-3">
     <label for="photo" class="form-label">Foto Profil</label>
-    <img id="photo-preview" src="/<?= esc($biodata['photo'] ?? 'uploads/photos/default.png') ?>" alt="Foto Profil" style="width:150px; height:150px; object-fit:cover; display:block; margin-bottom:10px;">
+    <img id="photo-preview" src="<?= esc($biodata['photo'] ?? 'uploads/photos/default.png') ?>" alt="Foto Profil" style="width:150px; height:150px; object-fit:cover; display:block; margin-bottom:10px;">
     <input type="file" class="form-control" id="photo" name="photo" onchange="previewPhoto(event)" accept="image/*" <?= empty($biodata['photo']) ? 'required' : '' ?>>
     <input type="hidden" name="old_photo" value="<?= esc($biodata['photo'] ?? '') ?>">
 </div>

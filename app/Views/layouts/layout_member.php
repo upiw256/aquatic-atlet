@@ -146,7 +146,7 @@
             Swal.fire({
                 icon: 'error',
                 title: 'Gagal',
-                text: 'Periksa kembali data yang Anda masukkan.',
+                text: '<?= session()->getFlashdata('error') ?>',
             });
         <?php endif; ?>
         <?php if (session()->getFlashdata('warning')): ?>
